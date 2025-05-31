@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.til.light_iot_cloud.mapper.LightDataMapper">
+
+    <resultMap id="BaseResultMap" type="com.til.light_iot_cloud.data.LightData">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="lightId" column="light_id" jdbcType="BIGINT"/>
+            <result property="time" column="time" jdbcType="TIMESTAMP"/>
+            <result property="humidity" column="humidity" jdbcType="FLOAT"/>
+            <result property="temperature" column="temperature" jdbcType="FLOAT"/>
+            <result property="pm10" column="pm10" jdbcType="FLOAT"/>
+            <result property="pm25" column="pm2_5" jdbcType="FLOAT"/>
+            <result property="illumination" column="illumination" jdbcType="FLOAT"/>
+            <result property="windSpeed" column="wind_speed" jdbcType="FLOAT"/>
+            <result property="windDirection" column="wind_direction" jdbcType="FLOAT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,light_id,time,
+        humidity,temperature,pm10,
+        pm2_5,illumination,wind_speed,
+        wind_direction
+    </sql>
+</mapper>

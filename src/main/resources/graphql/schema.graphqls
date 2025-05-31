@@ -1,0 +1,42 @@
+scalar DateTime
+@specifiedBy(url:
+"https://scalars.graphql.org/andimarek/date-time.html"
+)
+
+type Query {
+    # no jwt
+    login (username : String , password :String) : String
+
+    # no jwt
+    register (username : String , password :String) : Boolean
+
+
+    self : User!
+
+    # 仅管理员
+    users : [User!]!
+
+}
+
+
+
+type User {
+    id : Int!
+    username : String!
+    userType : UserType!
+    createdAt : DateTime!
+    phone : String
+    email : String
+
+
+}
+
+type  Light {
+    id : Int!
+    userId : Int!
+    name : String
+}
+
+enum UserType {
+    administrators, user, device
+}

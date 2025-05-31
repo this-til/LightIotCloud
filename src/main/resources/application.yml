@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: LightIotCloud
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/light_iot_cloud
+    username: root
+    password: 20041119LYS&lys
+
+  graphql:
+    graphiql:
+      enabled: true
+    websocket:
+      path: /graphql
+
+  security:
+    user:
+      name: admin
+      password: 123456
+
+cors:
+  allowed-origins: "*"
+
+logging:
+  level:
+    org.mybatis: DEBUG
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+jwt:
+  secret: ~secret~
+  expiration: 86400000 # 24小时
+
+
+
