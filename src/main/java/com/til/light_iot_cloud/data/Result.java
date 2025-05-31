@@ -1,8 +1,11 @@
 package com.til.light_iot_cloud.data;
 
+import kotlin.jvm.Strictfp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 @Data
 @AllArgsConstructor
@@ -28,5 +31,21 @@ public class Result<T> {
         return new Result<>(ResultType.ERROR, message == null
                 ? ""
                 : message, null);
+    }
+
+    public static <T> Result<T> ofBool(boolean success, @Nullable String successMessage, @Nullable String failureMessage) {
+        return new Result<>(
+                success
+                        ? ResultType.SUCCESSFUL
+                        : ResultType.FAIL,
+                success
+                        ? Objects.requireNonNullElse(successMessage, "")
+                        : Objects.requireNonNullElse(failureMessage, ""),
+                null
+        );
+    }
+
+    public static <T> Result<T> ofBool(boolean success) {
+        return ofBool(success, null, null);
     }
 }

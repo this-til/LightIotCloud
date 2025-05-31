@@ -3,6 +3,9 @@ package com.til.light_iot_cloud.data;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import lombok.Data;
 
@@ -37,12 +40,12 @@ public class User {
     /**
      * 创建时间
      */
-    private Date createdAt;
+    private OffsetDateTime createdAt;
 
     /**
      * 最后更新时间
      */
-    private Date updatedAt;
+    private OffsetDateTime updatedAt;
 
     /**
      * 最后登录时间

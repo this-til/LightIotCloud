@@ -11,7 +11,7 @@
             <result property="humidity" column="humidity" jdbcType="FLOAT"/>
             <result property="temperature" column="temperature" jdbcType="FLOAT"/>
             <result property="pm10" column="pm10" jdbcType="FLOAT"/>
-            <result property="pm25" column="pm2_5" jdbcType="FLOAT"/>
+            <result property="pm2_5" column="pm2_5" jdbcType="FLOAT"/>
             <result property="illumination" column="illumination" jdbcType="FLOAT"/>
             <result property="windSpeed" column="wind_speed" jdbcType="FLOAT"/>
             <result property="windDirection" column="wind_direction" jdbcType="FLOAT"/>

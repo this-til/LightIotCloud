@@ -67,7 +67,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User userByUsername = getUserByUsername(username);
 
         if (userByUsername == null) {
-            throw new Exception("用户不存在");
+            throw new Exception("the user does not exist");
+        }
+
+        if (!passwordEncoder.matches(password, userByUsername.getPassword())) {
+            throw new Exception("password error");
         }
 
         return jwtTokenConfig.generateJwt(userByUsername);

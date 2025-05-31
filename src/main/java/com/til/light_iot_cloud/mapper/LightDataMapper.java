@@ -2,6 +2,7 @@ package com.til.light_iot_cloud.mapper;
 
 import com.til.light_iot_cloud.data.LightData;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
 * @author cat
@@ -9,6 +10,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @createDate 2025-05-30 20:16:25
 * @Entity com.til.light_iot_cloud.opjo.LightData
 */
+@Mapper
 public interface LightDataMapper extends BaseMapper<LightData> {
 
 }

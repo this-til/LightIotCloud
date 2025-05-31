@@ -4,6 +4,7 @@ scalar DateTime
 )
 
 type Query {
+
     # no jwt
     login (username : String , password :String) : String
 
@@ -13,30 +14,97 @@ type Query {
 
     self : User!
 
-    # 仅管理员
-    users : [User!]!
-
 }
 
+#type Subscription {
+#}
 
-
-type User {
-    id : Int!
-    username : String!
-    userType : UserType!
-    createdAt : DateTime!
-    phone : String
-    email : String
-
-
+input TimeRange {
+    start : DateTime
+    end : DateTime
 }
 
-type  Light {
-    id : Int!
-    userId : Int!
-    name : String
+type Result {
+    resultType : ResultType
+    message: String
+}
+
+enum ResultType {
+    SUCCESSFUL
+    FAIL
+    ERROR
 }
 
 enum UserType {
     administrators, user, device
+}
+
+type User {
+
+    id : Int!
+    username : String!
+    userType : UserType!
+    createdAt : DateTime!
+    updatedAt : DateTime!
+    phone : String
+    email : String
+
+    lights : [Light!]!
+    cars : [Car!]!
+
+    getLightByName(name : String) : Light
+    getCarByName(name : String) : Car
+    getLightById(id : Int) : Light
+    getCarById(id : Int) : Car
+
+    registerLight(name : String!) : Result!
+    registerCar(name : String!) : Result!
+}
+
+type Light   {
+
+    id : Int!
+    userId : Int!
+    name : String!
+    createdAt : DateTime!
+    updatedAt : DateTime!
+
+    datas(timeRange : TimeRange) : [LightData!]!
+
+
+    updata(lightDataInput : LightDataInput) : Result
+}
+
+type Car {
+    id : Int!
+    userId : Int!
+    name : String!
+    createdAt : DateTime!
+    updatedAt : DateTime!
+}
+
+type LightData {
+    id : Int!
+    lightId : Int!
+
+    time : DateTime!
+
+    humidity : Float
+    temperature : Float
+    pm10 : Float
+    pm2_5 : Float
+    illumination : Float
+    windSpeed : Float
+    windDirection : Float
+}
+
+
+input  LightDataInput  {
+    humidity : Float
+    temperature : Float
+    pm10 : Float
+    pm2_5 : Float
+    illumination : Float
+    windSpeed : Float
+    windDirection : Float
 }
