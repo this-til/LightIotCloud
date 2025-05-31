@@ -6,9 +6,9 @@ import lombok.Data;
 public class DetectionItemInput {
     String model;
     String item;
-    Float x;
-    Float y;
-    Float w;
-    Float h;
-    Float probability;
+    Double x;
+    Double y;
+    Double w;
+    Double h;
+    Double probability;
 }

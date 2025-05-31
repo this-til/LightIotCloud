@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 /**
 * @author cat
 * @description 针对表【detection_model】的数据库操作Service实现
-* @createDate 2025-05-31 20:33:36
+* @createDate 2025-05-31 21:06:52
 */
 @Service
 public class DetectionModelServiceImpl extends ServiceImpl<DetectionModelMapper, DetectionModel>

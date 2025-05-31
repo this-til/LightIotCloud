@@ -6,10 +6,11 @@
 
     <resultMap id="BaseResultMap" type="com.til.light_iot_cloud.data.DetectionModel">
             <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="userId" column="user_id" jdbcType="INTEGER"/>
             <result property="name" column="name" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,name
+        id,user_id,name
     </sql>
 </mapper>

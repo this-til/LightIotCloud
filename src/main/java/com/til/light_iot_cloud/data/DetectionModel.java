@@ -22,6 +22,11 @@ public class DetectionModel {
     /**
      * 
      */
+    private Long userId;
+
+    /**
+     * 
+     */
     private String name;
 
     @Override
@@ -37,6 +42,7 @@ public class DetectionModel {
         }
         DetectionModel other = (DetectionModel) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
+            && (this.getUserId() == null ? other.getUserId() == null : this.getUserId().equals(other.getUserId()))
             && (this.getName() == null ? other.getName() == null : this.getName().equals(other.getName()));
     }
 
@@ -45,6 +51,7 @@ public class DetectionModel {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+        result = prime * result + ((getUserId() == null) ? 0 : getUserId().hashCode());
         result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
         return result;
     }
@@ -56,6 +63,7 @@ public class DetectionModel {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
+        sb.append(", userId=").append(userId);
         sb.append(", name=").append(name);
         sb.append("]");
         return sb.toString();
