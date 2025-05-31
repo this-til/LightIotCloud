@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.til.light_iot_cloud.mapper.DetectionItemMapper">
+
+    <resultMap id="BaseResultMap" type="com.til.light_iot_cloud.data.DetectionItem">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="modelId" column="model_id" jdbcType="BIGINT"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,model_id,name
+    </sql>
+</mapper>
