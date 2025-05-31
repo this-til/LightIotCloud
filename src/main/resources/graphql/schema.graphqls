@@ -3,6 +3,8 @@ scalar DateTime
 "https://scalars.graphql.org/andimarek/date-time.html"
 )
 
+scalar Upload
+
 type Query {
 
     # no jwt
@@ -74,7 +76,23 @@ type Light {
     datas(timeRange : TimeRange) : [LightData!]!
     detectionKeyframes(timeRange : TimeRange) : [DetectionKeyframe!]!
 
-    updata(lightDataInput : LightDataInput) : Result
+    reportUpdata(lightDataInput : LightDataInput) : Result
+    reportDetection(detectionInput : DetectionInput) : Result
+}
+
+input DetectionInput  {
+    items : [DetectionItemInput]
+    image : Upload
+}
+
+input DetectionItemInput {
+    model : String!
+    item : String!
+    x : Float!
+    y : Float!
+    w : Float!
+    h : Float!
+    probability : Float!
 }
 
 type Car {

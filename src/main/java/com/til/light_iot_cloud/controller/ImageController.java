@@ -16,14 +16,13 @@ public class ImageController {
     @Resource
     private ImageStorageService storageService;
 
-    @PostMapping("/upload")
+    /*@PostMapping("/upload")
     public String uploadImage(@RequestParam("url") MultipartFile file, RedirectAttributes redirectAttributes) {
-
     }
 
     @GetMapping("/image")
     public ResponseEntity<org.springframework.core.io.Resource> serveThumbnail(@RequestParam("url") String filename) {
 
-    }
+    }*/
 
 }
