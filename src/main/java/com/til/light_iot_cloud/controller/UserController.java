@@ -1,6 +1,5 @@
-package com.til.light_iot_cloud.controller.query;
+package com.til.light_iot_cloud.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.til.light_iot_cloud.data.*;
 import com.til.light_iot_cloud.service.CarService;
 import com.til.light_iot_cloud.service.LightService;
@@ -29,6 +28,7 @@ public class UserController {
         }
         return authContext.getUser();
     }
+
 
     @SchemaMapping(typeName = "User")
     public List<Light> lights(User user) {

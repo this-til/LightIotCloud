@@ -24,4 +24,5 @@ public interface UserService extends IService<User> {
      */
     String login(String username, String password);
 
+    User temporary(String username, String password);
 }

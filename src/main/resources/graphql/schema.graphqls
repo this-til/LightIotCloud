@@ -13,6 +13,8 @@ type Query {
 
 
     self : User!
+    temporary(username : String , password :String) : User
+
 
 }
 
@@ -41,7 +43,7 @@ enum UserType {
 
 type User {
 
-    id : Int!
+    id : ID!
     username : String!
     userType : UserType!
     createdAt : DateTime!
@@ -54,38 +56,38 @@ type User {
 
     getLightByName(name : String) : Light
     getCarByName(name : String) : Car
-    getLightById(id : Int) : Light
-    getCarById(id : Int) : Car
+    getLightById(id : ID) : Light
+    getCarById(id : ID) : Car
 
     registerLight(name : String!) : Result!
     registerCar(name : String!) : Result!
 }
 
-type Light   {
+type Light {
 
-    id : Int!
-    userId : Int!
+    id : ID!
+    userId : ID!
     name : String!
     createdAt : DateTime!
     updatedAt : DateTime!
 
     datas(timeRange : TimeRange) : [LightData!]!
-
+    detectionKeyframes(timeRange : TimeRange) : [DetectionKeyframe!]!
 
     updata(lightDataInput : LightDataInput) : Result
 }
 
 type Car {
-    id : Int!
-    userId : Int!
+    id : ID!
+    userId : ID!
     name : String!
     createdAt : DateTime!
     updatedAt : DateTime!
 }
 
 type LightData {
-    id : Int!
-    lightId : Int!
+    id : ID!
+    lightId : ID!
 
     time : DateTime!
 
@@ -98,8 +100,31 @@ type LightData {
     windDirection : Float
 }
 
+type DetectionKeyframe {
+    id : ID!
+    lightId : ID!
+    url : String!
+    time : DateTime!
 
-input  LightDataInput  {
+    detections : [Detection!]!
+}
+
+type Detection {
+    id : ID!
+    keyframeId : ID!
+    itemId : ID!
+    x : Float!
+    y : Float!
+    w : Float!
+    h : Float!
+    probability : Float!
+
+    model : String
+    item : String
+
+}
+
+input LightDataInput  {
     humidity : Float
     temperature : Float
     pm10 : Float

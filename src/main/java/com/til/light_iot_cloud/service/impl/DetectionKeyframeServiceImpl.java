@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 /**
 * @author cat
 * @description 针对表【detection_keyframe】的数据库操作Service实现
-* @createDate 2025-05-31 17:32:54
+* @createDate 2025-05-31 17:45:31
 */
 @Service
 public class DetectionKeyframeServiceImpl extends ServiceImpl<DetectionKeyframeMapper, DetectionKeyframe>

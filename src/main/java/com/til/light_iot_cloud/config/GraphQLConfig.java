@@ -5,12 +5,12 @@ import graphql.scalars.ExtendedScalars;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.graphql.execution.RuntimeWiringConfigurer;
+import org.springframework.graphql.server.webflux.GraphQlWebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
 @Configuration
-@EnableWebSocketMessageBroker
-public class GraphQLConfig  implements WebSocketMessageBrokerConfigurer {
+public class GraphQLConfig {
     @Bean
     public AuthInterceptor authInterceptor() {
         return new AuthInterceptor();
@@ -20,4 +20,5 @@ public class GraphQLConfig  implements WebSocketMessageBrokerConfigurer {
     public RuntimeWiringConfigurer runtimeWiringConfigurer() {
         return wiringBuilder -> wiringBuilder.scalar(ExtendedScalars.DateTime);
     }
+
 }

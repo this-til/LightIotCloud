@@ -77,6 +77,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return jwtTokenConfig.generateJwt(userByUsername);
     }
 
+    @SneakyThrows
+    @Override
+    public User temporary(String username, String password) {
+        User userByUsername = getUserByUsername(username);
+
+        if (userByUsername == null) {
+            throw new Exception("the user does not exist");
+        }
+
+        if (!passwordEncoder.matches(password, userByUsername.getPassword())) {
+            throw new Exception("password error");
+        }
+        return userByUsername;
+    }
 }
 
 

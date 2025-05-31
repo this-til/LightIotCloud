@@ -37,5 +37,9 @@ jwt:
   secret: ~secret~
   expiration: 86400000 # 24小时
 
-
+image:
+  storage-path: "/uploads/"
+  thumbnail:
+    width: 0.2
+    height: 0.2
 

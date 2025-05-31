@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+
 import lombok.Data;
 
 /**
@@ -29,6 +32,11 @@ public class DetectionKeyframe {
      */
     private String url;
 
+    /**
+     * 
+     */
+    private OffsetDateTime time;
+
     @Override
     public boolean equals(Object that) {
         if (this == that) {
@@ -43,7 +51,8 @@ public class DetectionKeyframe {
         DetectionKeyframe other = (DetectionKeyframe) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
             && (this.getLightId() == null ? other.getLightId() == null : this.getLightId().equals(other.getLightId()))
-            && (this.getUrl() == null ? other.getUrl() == null : this.getUrl().equals(other.getUrl()));
+            && (this.getUrl() == null ? other.getUrl() == null : this.getUrl().equals(other.getUrl()))
+            && (this.getTime() == null ? other.getTime() == null : this.getTime().equals(other.getTime()));
     }
 
     @Override
@@ -53,6 +62,7 @@ public class DetectionKeyframe {
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
         result = prime * result + ((getLightId() == null) ? 0 : getLightId().hashCode());
         result = prime * result + ((getUrl() == null) ? 0 : getUrl().hashCode());
+        result = prime * result + ((getTime() == null) ? 0 : getTime().hashCode());
         return result;
     }
 
@@ -65,6 +75,7 @@ public class DetectionKeyframe {
         sb.append(", id=").append(id);
         sb.append(", lightId=").append(lightId);
         sb.append(", url=").append(url);
+        sb.append(", time=").append(time);
         sb.append("]");
         return sb.toString();
     }

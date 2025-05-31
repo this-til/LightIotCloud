@@ -8,9 +8,11 @@
             <id property="id" column="id" jdbcType="BIGINT"/>
             <result property="lightId" column="light_id" jdbcType="BIGINT"/>
             <result property="url" column="url" jdbcType="VARCHAR"/>
+            <result property="time" column="time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,light_id,url
+        id,light_id,url,
+        time
     </sql>
 </mapper>
