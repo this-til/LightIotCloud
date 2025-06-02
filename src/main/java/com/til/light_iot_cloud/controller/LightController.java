@@ -2,20 +2,20 @@ package com.til.light_iot_cloud.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.incrementer.FirebirdKeyGenerator;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.til.light_iot_cloud.data.*;
 import com.til.light_iot_cloud.data.input.DetectionInput;
 import com.til.light_iot_cloud.data.input.DetectionItemInput;
 import com.til.light_iot_cloud.data.input.TimeRange;
-import com.til.light_iot_cloud.service.DetectionItemService;
-import com.til.light_iot_cloud.service.DetectionKeyframeService;
-import com.til.light_iot_cloud.service.DetectionModelService;
-import com.til.light_iot_cloud.service.LightDataService;
+import com.til.light_iot_cloud.service.*;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,6 +34,9 @@ public class LightController {
 
     @Resource
     private DetectionModelService detectionModelService;
+
+    @Resource
+    private DetectionService detectionService;
 
     @SchemaMapping(typeName = "Light")
     public List<LightData> datas(Light light, @Argument @Nullable TimeRange timeRange) {
@@ -55,7 +58,11 @@ public class LightController {
     }
 
     @SchemaMapping(typeName = "Light")
-    public List<DetectionKeyframe> detectionKeyframes(Light light, @Argument @Nullable TimeRange timeRange) {
+    public IPage<DetectionKeyframe> detectionKeyframes(
+            Light light,
+            @Argument @Nullable Page<DetectionKeyframe> page,
+            @Argument @Nullable TimeRange timeRange
+    ) {
 
         LambdaQueryWrapper<DetectionKeyframe> listQuery = new LambdaQueryWrapper<>();
         listQuery.eq(DetectionKeyframe::getLightId, light.getId());
@@ -70,7 +77,12 @@ public class LightController {
         }
 
         listQuery.orderByAsc(DetectionKeyframe::getTime);
-        return detectionKeyframeService.list(listQuery);
+
+        if (page == null) {
+            page = new Page<>();
+        }
+
+        return detectionKeyframeService.page(page, listQuery);
     }
 
 
@@ -81,12 +93,14 @@ public class LightController {
     }
 
     @SchemaMapping(typeName = "Light")
+    @Transactional
     public Result<Void> reportDetection(Light light, @Argument DetectionInput detectionInput) {
 
         DetectionKeyframe detectionKeyframe = new DetectionKeyframe();
 
         detectionKeyframe.setLightId(light.getId());
 
+        detectionKeyframeService.save(detectionKeyframe);
 
         List<DetectionItemInput> items = detectionInput.getItems();
 
@@ -94,15 +108,6 @@ public class LightController {
                 .collect(Collectors.groupingBy(DetectionItemInput::getModel));
 
         Map<String, DetectionModel> stringDetectionModelMap = detectionModelService.ensureExistence(modelMap.keySet(), light.getUserId());
-
-        Map<DetectionModel, List<DetectionItemInput>> collect = modelMap
-                .entrySet()
-                .stream()
-                .collect(
-                        Collectors.toMap(
-                                e -> stringDetectionModelMap.get(e.getKey()), Map.Entry::getValue
-                        )
-                );
 
         List<Detection> detectionList = new ArrayList<>();
 
@@ -122,6 +127,7 @@ public class LightController {
                 DetectionItem detectionItem = stringDetectionItemMap.get(itemEntry.getKey());
 
                 for(DetectionItemInput detectionItemInput : itemEntry.getValue()) {
+
                     Detection detection = new Detection();
 
                     detection.setProbability(detectionItemInput.getProbability());
@@ -131,7 +137,7 @@ public class LightController {
                     detection.setY(detectionItemInput.getY());
 
                     detection.setItemId(detectionItem.getId());
-                    detection.setKeyframeId();
+                    detection.setKeyframeId(detectionKeyframe.getId());
 
                     detectionList.add(detection);
 
@@ -139,10 +145,11 @@ public class LightController {
 
             }
 
-
         }
 
+        detectionService.saveBatch(detectionList);
 
+        return Result.ofBool(true);
     }
 }
 

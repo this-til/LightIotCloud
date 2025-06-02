@@ -5,7 +5,7 @@
     </settings>
 
     <Properties>
-        <Property name="baseDir" value="E:/logs"/>
+        <Property name="baseDir" value="D:/logs"/>
     </Properties>
 
     <Appenders>
@@ -13,8 +13,13 @@
             <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch） -->
             <ThresholdFilter level="info" onMatch="ACCEPT"
                              onMismatch="DENY"/>
+            <!--<PatternLayout pattern="[%d{MM:dd HH:mm:ss.SSS}] [%level] [%logger{36}] - %msg%n"/>-->
             <PatternLayout
-                    pattern="[%d{MM:dd HH:mm:ss.SSS}] [%level] [%logger{36}] - %msg%n"/>
+                    pattern="%blue{%d{yyyy-MM-dd HH:mm:ss.SSS}} [%highlight{%level}] [%t] [%cyan{%c{1.}}:%L] %highlight{%m}{FATAL=red, ERROR=red, WARN=yellow, INFO=blue, DEBUG=green, TRACE=white}%n"
+                    disableAnsi="false" noConsoleNoAnsi="false"/>
+
+            <!--<PatternLayout pattern="%highlight{[%d] %-5p [%t] %C{2}.%M:%L - %m%n}{FATAL=red, ERROR=red, WARN=yellow, INFO=blue, DEBUG=green, TRACE=white}"
+                           disableAnsi="false" noConsoleNoAnsi="false"/>-->
         </Console>
 
         <!--debug级别日志文件输出-->

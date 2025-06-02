@@ -40,5 +40,30 @@ public interface CarService extends IService<Car> {
         );
     }
 
+    default Car registerCar(Long userId, String name) {
+        Car car = getCarByName(userId, name);
+
+        if (car != null) {
+            throw new SecurityException("Car already exists");
+        }
+
+        car = new Car();
+        car.setUserId(userId);
+        car.setName(name);
+        save(car);
+
+        return car;
+    }
+
+    default Car existCar(Long userId, String name) {
+        Car car = getCarByName(userId, name);
+
+        if (car != null) {
+            return car;
+        }
+
+        return registerCar(userId, name);
+    }
+
 
 }

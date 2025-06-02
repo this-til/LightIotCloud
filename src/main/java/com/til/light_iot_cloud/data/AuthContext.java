@@ -9,8 +9,27 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class AuthContext {
-    String token;
+    LinkType linkType;
+
+
+    @Nullable
     User user;
+
+    /***
+     * 作为灯杆登入
+     */
+    @Nullable
+    Light light;
+
+    /***
+     * 作为检测小车登入
+     */
+    @Nullable
+    Car car;
+
+    public AuthContext(LinkType linkType, @Nullable User user) {
+        this.linkType = linkType;
+        this.user = user;
+    }
 }

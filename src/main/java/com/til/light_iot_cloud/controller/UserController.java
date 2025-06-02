@@ -29,7 +29,6 @@ public class UserController {
         return authContext.getUser();
     }
 
-
     @SchemaMapping(typeName = "User")
     public List<Light> lights(User user) {
         return lightService.getLightsByUser(user.getId());
@@ -61,42 +60,22 @@ public class UserController {
     }
 
     @SchemaMapping(typeName = "User")
-    public Result<Void> registerLight(User user, @Argument String name) {
-        if (name == null || name.isEmpty()) {
-            throw new SecurityException("Name is empty");
-        }
-
-        Light light = lightService.getLightByName(user.getId(), name);
-
-        if (light != null) {
-            throw new SecurityException("User already exists");
-        }
-
-        light = new Light();
-        light.setName(name);
-        light.setUserId(user.getId());
-
-        return Result.ofBool(lightService.save(light));
+    public Light registerLight(User user, @Argument String name) {
+        return lightService.registerLight(user.getId(), name);
     }
 
     @SchemaMapping(typeName = "User")
-    public Result<Void> registerCar(User user, @Argument String name) {
-        if (name == null || name.isEmpty()) {
-            throw new SecurityException("Name is empty");
-        }
-
-        Car car = carService.getCarByName(user.getId(), name);
-
-        if (car != null) {
-            throw new SecurityException("User already exists");
-        }
-
-        car = new Car();
-        car.setName(name);
-        car.setUserId(user.getId());
-
-        return Result.ofBool(carService.save(car));
+    public Car registerCar(User user, @Argument String name) {
+        return carService.registerCar(user.getId(), name);
     }
 
+    @SchemaMapping(typeName = "User")
+    public Light existLight(User user, @Argument String name) {
+        return lightService.existLight(user.getId(), name);
+    }
 
+    @SchemaMapping(typeName = "User")
+    public Car existCar(User user, @Argument String name) {
+        return carService.existCar(user.getId(), name);
+    }
 }

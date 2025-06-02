@@ -3,8 +3,6 @@ scalar DateTime
 "https://scalars.graphql.org/andimarek/date-time.html"
 )
 
-scalar Upload
-
 type Query {
 
     # no jwt
@@ -13,15 +11,20 @@ type Query {
     # no jwt
     register (username : String , password :String) : Boolean
 
-
     self : User!
     temporary(username : String , password :String) : User
-
 
 }
 
 #type Subscription {
 #}
+
+input Page {
+    current : Int
+    size : Int
+    total : Int
+    searchCount : Int
+}
 
 input TimeRange {
     start : DateTime
@@ -58,11 +61,15 @@ type User {
 
     getLightByName(name : String) : Light
     getCarByName(name : String) : Car
+
     getLightById(id : ID) : Light
     getCarById(id : ID) : Car
 
-    registerLight(name : String!) : Result!
-    registerCar(name : String!) : Result!
+    existLight(name : String!) : Light!
+    existCar(name : String!) : Car!
+
+    registerLight(name : String!) : Light!
+    registerCar(name : String!) : Car!
 }
 
 type Light {
@@ -74,7 +81,7 @@ type Light {
     updatedAt : DateTime!
 
     datas(timeRange : TimeRange) : [LightData!]!
-    detectionKeyframes(timeRange : TimeRange) : [DetectionKeyframe!]!
+    detectionKeyframes(page : Page, timeRange : TimeRange) : [DetectionKeyframe!]!
 
     reportUpdata(lightDataInput : LightDataInput) : Result
     reportDetection(detectionInput : DetectionInput) : Result

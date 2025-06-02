@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.til.light_iot_cloud.data.Car;
 import com.til.light_iot_cloud.data.Light;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.til.light_iot_cloud.data.User;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -38,6 +39,35 @@ public interface LightService extends IService<Light> {
                         .eq(Light::getUserId, userId)
                         .eq(Light::getId, id)
         );
+    }
+
+
+    default Light registerLight(Long userId, String name) {
+        Light light = getLightByName(userId, name);
+
+        if (light != null) {
+            throw new SecurityException("Light already exists");
+        }
+
+        light = new Light();
+        light.setName(name);
+        light.setUserId(userId);
+
+        if (!save(light)) {
+            throw new SecurityException("save failed");
+        }
+
+        return light;
+    }
+
+    default Light existLight(Long userId, String name) {
+        Light light = getLightByName(userId, name);
+
+        if (light != null) {
+            return light;
+        }
+
+        return registerLight(userId, name);
     }
 
 }
