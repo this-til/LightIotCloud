@@ -1,16 +1,21 @@
 package com.til.light_iot_cloud.interceptor;
 
+import com.til.light_iot_cloud.component.WebSocketConnectionManager;
 import com.til.light_iot_cloud.data.*;
+import com.til.light_iot_cloud.enums.LinkType;
 import com.til.light_iot_cloud.service.CarService;
 import com.til.light_iot_cloud.service.LightService;
 import com.til.light_iot_cloud.service.UserService;
 import jakarta.annotation.Resource;
+import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.graphql.server.WebSocketGraphQlInterceptor;
 import org.springframework.graphql.server.WebSocketSessionInfo;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.WebSocketSession;
 import reactor.core.publisher.Mono;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Objects;
 
@@ -32,6 +37,11 @@ public class DeviceStatusInterceptor implements WebSocketGraphQlInterceptor {
     @Resource
     private UserService userService;
 
+    @Resource
+    private WebSocketConnectionManager webSocketConnectionManager;
+
+
+    @SneakyThrows
     @Override
     public @NotNull
     Mono<Object> handleConnectionInitialization(@NotNull WebSocketSessionInfo info, Map<String, Object> payload) {
@@ -80,7 +90,7 @@ public class DeviceStatusInterceptor implements WebSocketGraphQlInterceptor {
             return Mono.just(payload);
         }
 
-        if (!info.getAttributes().containsKey(DEVICE_NAME)) {
+        if (!payload.containsKey(DEVICE_NAME)) {
             return Mono.error(new IllegalArgumentException("Device name is missing"));
         }
 
@@ -90,6 +100,15 @@ public class DeviceStatusInterceptor implements WebSocketGraphQlInterceptor {
             return Mono.error(new IllegalArgumentException("Device name is missing"));
         }
 
+
+        Field sessionField = info.getClass().getDeclaredField("session");
+        sessionField.setAccessible(true);
+        WebSocketSession session = (WebSocketSession) sessionField.get(info);
+
+
+        AuthContext authContext = new AuthContext(LinkType.WEBSOCKET_LIGHT, user);
+        authContext.setWebSocketSession(session);
+
         switch (linkType) {
             case WEBSOCKET_LIGHT -> {
                 Light light = lightService.getLightByName(user.getId(), deviceName);
@@ -98,12 +117,11 @@ public class DeviceStatusInterceptor implements WebSocketGraphQlInterceptor {
                     return Mono.error(new IllegalArgumentException("Device " + deviceName + " not found"));
                 }
 
-                AuthContext authContext = new AuthContext(LinkType.WEBSOCKET_LIGHT, user);
+
                 authContext.setLight(light);
 
                 info.getAttributes().put(LINK_TYPE, LinkType.WEBSOCKET_LIGHT);
                 info.getAttributes().put(AUTH_CONTEXT, authContext);
-                return Mono.just(payload);
             }
             case WEBSOCKET_CAR -> {
 
@@ -113,17 +131,18 @@ public class DeviceStatusInterceptor implements WebSocketGraphQlInterceptor {
                     return Mono.error(new IllegalArgumentException("Device " + deviceName + " not found"));
                 }
 
-                AuthContext authContext = new AuthContext(LinkType.WEBSOCKET_CAR, user);
                 authContext.setCar(car);
+
                 info.getAttributes().put(LINK_TYPE, LinkType.WEBSOCKET_CAR);
                 info.getAttributes().put(AUTH_CONTEXT, authContext);
-                return Mono.just(payload);
             }
             default -> {
                 return Mono.error(new IllegalArgumentException("Invalid link type: " + linkTypeStr));
             }
         }
 
+        webSocketConnectionManager.registerSession(authContext);
+        return Mono.just(payload);
     }
 
     @Override

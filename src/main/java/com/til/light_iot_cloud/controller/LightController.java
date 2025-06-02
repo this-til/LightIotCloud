@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.incrementer.FirebirdKeyGenerator;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.til.light_iot_cloud.component.WebSocketConnectionManager;
 import com.til.light_iot_cloud.data.*;
 import com.til.light_iot_cloud.data.input.DetectionInput;
 import com.til.light_iot_cloud.data.input.DetectionItemInput;
@@ -38,7 +39,17 @@ public class LightController {
     @Resource
     private DetectionService detectionService;
 
+    @Resource
+    private WebSocketConnectionManager webSocketConnectionManager;
+
+
     @SchemaMapping(typeName = "Light")
+    public boolean online(Light light) {
+        return webSocketConnectionManager.getPublisherByLightId(light.getId()) != null;
+    }
+
+    @SchemaMapping(typeName = "Light")
+
     public List<LightData> datas(Light light, @Argument @Nullable TimeRange timeRange) {
 
         LambdaQueryWrapper<LightData> listQuery = new LambdaQueryWrapper<>();

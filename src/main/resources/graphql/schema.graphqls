@@ -3,6 +3,8 @@ scalar DateTime
 "https://scalars.graphql.org/andimarek/date-time.html"
 )
 
+scalar Bytes
+
 type Query {
 
     # no jwt
@@ -14,6 +16,8 @@ type Query {
     self : User!
     temporary(username : String , password :String) : User
 
+    lightSelf : Light
+    carSelf : Car
 }
 
 #type Subscription {
@@ -80,6 +84,8 @@ type Light {
     createdAt : DateTime!
     updatedAt : DateTime!
 
+    online : Boolean
+
     datas(timeRange : TimeRange) : [LightData!]!
     detectionKeyframes(page : Page, timeRange : TimeRange) : [DetectionKeyframe!]!
 
@@ -108,6 +114,8 @@ type Car {
     name : String!
     createdAt : DateTime!
     updatedAt : DateTime!
+
+    online : Boolean
 }
 
 type LightData {

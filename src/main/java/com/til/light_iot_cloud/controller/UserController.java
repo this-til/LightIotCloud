@@ -21,13 +21,6 @@ public class UserController {
     @Resource
     private LightService lightService;
 
-    @QueryMapping
-    public User self(@ContextValue AuthContext authContext) {
-        if (authContext.getUser() == null) {
-            throw new SecurityException("You are not logged in");
-        }
-        return authContext.getUser();
-    }
 
     @SchemaMapping(typeName = "User")
     public List<Light> lights(User user) {

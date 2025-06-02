@@ -1,4 +1,4 @@
-package com.til.light_iot_cloud.data;
+package com.til.light_iot_cloud.enums;
 
 public enum LinkType {
     HTTP,

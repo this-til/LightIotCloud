@@ -1,6 +1,6 @@
 package com.til.light_iot_cloud.data;
 
-import kotlin.jvm.Strictfp;
+import com.til.light_iot_cloud.enums.ResultType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;

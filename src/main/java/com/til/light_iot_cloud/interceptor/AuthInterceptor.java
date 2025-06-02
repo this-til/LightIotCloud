@@ -2,7 +2,7 @@ package com.til.light_iot_cloud.interceptor;
 
 import com.til.light_iot_cloud.config.JwtTokenConfig;
 import com.til.light_iot_cloud.data.AuthContext;
-import com.til.light_iot_cloud.data.LinkType;
+import com.til.light_iot_cloud.enums.LinkType;
 import com.til.light_iot_cloud.data.User;
 import com.til.light_iot_cloud.service.UserService;
 import jakarta.annotation.Resource;
@@ -13,8 +13,6 @@ import org.springframework.graphql.server.WebGraphQlRequest;
 import org.springframework.graphql.server.WebGraphQlResponse;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.Map;
 
 @Component
 public class AuthInterceptor implements WebGraphQlInterceptor {

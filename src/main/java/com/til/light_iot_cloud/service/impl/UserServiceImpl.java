@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.til.light_iot_cloud.config.JwtTokenConfig;
 import com.til.light_iot_cloud.data.User;
-import com.til.light_iot_cloud.data.UserType;
+import com.til.light_iot_cloud.enums.UserType;
 import com.til.light_iot_cloud.service.UserService;
 import com.til.light_iot_cloud.mapper.UserMapper;
 import jakarta.annotation.Nullable;
