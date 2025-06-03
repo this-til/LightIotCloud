@@ -1,6 +1,5 @@
 package com.til.light_iot_cloud.context;
 
-import com.til.light_iot_cloud.data.AuthContext;
 import com.til.light_iot_cloud.type.ISubscriptionType;
 import jakarta.annotation.Nullable;
 import lombok.Getter;
@@ -30,7 +29,6 @@ public class Publisher {
         return (Sinks.Many<D>) subscriptionMap.get(subscriptionType.name());
     }
 
-
     public <D> Sinks.Many<D> registerSubscription(ISubscriptionType<D> subscriptionType) {
         Sinks.Many<?> many = subscriptionMap.get(subscriptionType.name());
         if (many != null) {
@@ -44,7 +42,7 @@ public class Publisher {
 
     @Nullable
     public <D> Sinks.Many<D> unregisterSubscription(ISubscriptionType<D> subscriptionType) {
-        Sinks.Many<?> many = subscriptionMap.get(subscriptionType.name());
+        Sinks.Many<?> many = subscriptionMap.remove(subscriptionType.name());
         if (many != null) {
             many.tryEmitComplete();
             //noinspection unchecked
@@ -60,6 +58,17 @@ public class Publisher {
             return (Sinks.Many<D>) many;
         }
         return registerSubscription(subscriptionType);
+    }
+
+    public <D> void publisher(ISubscriptionType<D> subscriptionType, D d) {
+        Sinks.Many<D> subscription = getSubscription(subscriptionType);
+        if (subscription != null) {
+            subscription.tryEmitNext(d);
+        }
+    }
+
+    public <D> void ensurePublisher(ISubscriptionType<D> subscriptionType, D d) {
+        existSubscription(subscriptionType).tryEmitNext(d);
     }
 
 

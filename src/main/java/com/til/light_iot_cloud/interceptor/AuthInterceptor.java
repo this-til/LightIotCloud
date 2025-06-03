@@ -1,7 +1,7 @@
 package com.til.light_iot_cloud.interceptor;
 
 import com.til.light_iot_cloud.config.JwtTokenConfig;
-import com.til.light_iot_cloud.data.AuthContext;
+import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.enums.LinkType;
 import com.til.light_iot_cloud.data.User;
 import com.til.light_iot_cloud.service.UserService;

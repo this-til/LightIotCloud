@@ -1,5 +1,8 @@
-package com.til.light_iot_cloud.data;
+package com.til.light_iot_cloud.context;
 
+import com.til.light_iot_cloud.data.Car;
+import com.til.light_iot_cloud.data.Light;
+import com.til.light_iot_cloud.data.User;
 import com.til.light_iot_cloud.enums.LinkType;
 import lombok.Data;
 import lombok.NoArgsConstructor;

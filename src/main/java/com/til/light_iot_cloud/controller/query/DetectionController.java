@@ -1,4 +1,4 @@
-package com.til.light_iot_cloud.controller;
+package com.til.light_iot_cloud.controller.query;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.til.light_iot_cloud.data.Detection;

@@ -5,23 +5,25 @@ scalar DateTime
 
 scalar Bytes
 
-type Query {
-
-    # no jwt
-    login (username : String , password :String) : String
-
-    # no jwt
-    register (username : String , password :String) : Boolean
-
-    self : User!
-    temporary(username : String , password :String) : User
-
-    lightSelf : Light
-    carSelf : Car
+schema {
+    query:  Query
+    mutation: Mutation
+    subscription: Subscription
 }
 
-#type Subscription {
-#}
+
+# -----------------------Com-----------------------
+
+type Result {
+    resultType : ResultType
+    message: String
+}
+
+enum ResultType {
+    SUCCESSFUL
+    FAIL
+    ERROR
+}
 
 input Page {
     current : Int
@@ -35,19 +37,17 @@ input TimeRange {
     end : DateTime
 }
 
-type Result {
-    resultType : ResultType
-    message: String
-}
 
-enum ResultType {
-    SUCCESSFUL
-    FAIL
-    ERROR
-}
+# -----------------------Com-----------------------
 
-enum UserType {
-    administrators, user, device
+# -----------------------Query-----------------------
+type Query {
+
+    self : User!
+
+    lightSelf : Light!
+
+    carSelf : Car!
 }
 
 type User {
@@ -68,12 +68,10 @@ type User {
 
     getLightById(id : ID) : Light
     getCarById(id : ID) : Car
+}
 
-    existLight(name : String!) : Light!
-    existCar(name : String!) : Car!
-
-    registerLight(name : String!) : Light!
-    registerCar(name : String!) : Car!
+enum UserType {
+    administrators, user, device
 }
 
 type Light {
@@ -88,34 +86,6 @@ type Light {
 
     datas(timeRange : TimeRange) : [LightData!]!
     detectionKeyframes(page : Page, timeRange : TimeRange) : [DetectionKeyframe!]!
-
-    reportUpdata(lightDataInput : LightDataInput) : Result
-    reportDetection(detectionInput : DetectionInput) : Result
-}
-
-input DetectionInput  {
-    items : [DetectionItemInput]
-    image : Upload
-}
-
-input DetectionItemInput {
-    model : String!
-    item : String!
-    x : Float!
-    y : Float!
-    w : Float!
-    h : Float!
-    probability : Float!
-}
-
-type Car {
-    id : ID!
-    userId : ID!
-    name : String!
-    createdAt : DateTime!
-    updatedAt : DateTime!
-
-    online : Boolean
 }
 
 type LightData {
@@ -136,7 +106,6 @@ type LightData {
 type DetectionKeyframe {
     id : ID!
     lightId : ID!
-    url : String!
     time : DateTime!
 
     detections : [Detection!]!
@@ -157,6 +126,72 @@ type Detection {
 
 }
 
+type Car {
+    id : ID!
+    userId : ID!
+    name : String!
+    createdAt : DateTime!
+    updatedAt : DateTime!
+
+    online : Boolean
+}
+
+
+# -----------------------Query-----------------------
+
+# -----------------------Mutation-----------------------
+
+type Mutation {
+
+    # no jwt
+    login (username : String!, password :String!) : String!
+
+    # no jwt
+    register (username : String! , password :String!) : Boolean
+
+    #用来判定JWT令牌是不是有效的
+    jwtEffective(jwt : String) : Boolean!
+
+    self : UserMutation!
+    lightSelf : LightMutation!
+    carSelf : CarMutation!
+
+}
+
+type UserMutation {
+    lights : [LightMutation!]!
+    cars : [CarMutation!]!
+
+    getLightByName(name : String) : LightMutation
+    getCarByName(name : String) : CarMutation
+
+    getLightById(id : ID) : LightMutation
+    getCarById(id : ID) : CarMutation
+
+    existLight(name : String!) : LightMutation!
+    existCar(name : String!) : CarMutation!
+}
+
+type LightMutation {
+    reportUpdate(lightDataInput : LightDataInput) : Result
+    reportDetection(detectionInput : DetectionInput) : Result
+}
+
+input DetectionInput  {
+    items : [DetectionItemInput]
+    image : Upload
+}
+
+input DetectionItemInput {
+    model : String!
+    item : String!
+    x : Float!
+    y : Float!
+    w : Float!
+    h : Float!
+    probability : Float!
+}
+
 input LightDataInput  {
     humidity : Float
     temperature : Float
@@ -166,3 +201,24 @@ input LightDataInput  {
     windSpeed : Float
     windDirection : Float
 }
+
+type CarMutation {
+    id : ID
+}
+
+# -----------------------Mutation-----------------------
+
+# -----------------------Subscription-----------------------
+
+type Subscription {
+    updateConfiguration : WebSocketConnectionManager
+}
+
+type WebSocketConnectionManager{
+    key : String!
+    value : String!
+}
+
+# -----------------------Subscription-----------------------
+
+

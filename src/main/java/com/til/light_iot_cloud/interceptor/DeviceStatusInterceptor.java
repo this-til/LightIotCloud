@@ -1,6 +1,7 @@
 package com.til.light_iot_cloud.interceptor;
 
 import com.til.light_iot_cloud.component.WebSocketConnectionManager;
+import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.data.*;
 import com.til.light_iot_cloud.enums.LinkType;
 import com.til.light_iot_cloud.service.CarService;
@@ -43,8 +44,7 @@ public class DeviceStatusInterceptor implements WebSocketGraphQlInterceptor {
 
     @SneakyThrows
     @Override
-    public @NotNull
-    Mono<Object> handleConnectionInitialization(@NotNull WebSocketSessionInfo info, Map<String, Object> payload) {
+    public @NotNull Mono<Object> handleConnectionInitialization(@NotNull WebSocketSessionInfo info, Map<String, Object> payload) {
 
         String username = Objects.requireNonNullElse(payload.get(USERNAME), "").toString();
         String password = Objects.requireNonNullElse(payload.get(PASSWORD), "").toString();
@@ -111,12 +111,7 @@ public class DeviceStatusInterceptor implements WebSocketGraphQlInterceptor {
 
         switch (linkType) {
             case WEBSOCKET_LIGHT -> {
-                Light light = lightService.getLightByName(user.getId(), deviceName);
-
-                if (light == null) {
-                    return Mono.error(new IllegalArgumentException("Device " + deviceName + " not found"));
-                }
-
+                Light light = lightService.existLight(user.getId(), deviceName);
 
                 authContext.setLight(light);
 
@@ -124,12 +119,7 @@ public class DeviceStatusInterceptor implements WebSocketGraphQlInterceptor {
                 info.getAttributes().put(AUTH_CONTEXT, authContext);
             }
             case WEBSOCKET_CAR -> {
-
-                Car car = carService.getCarByName(user.getId(), deviceName);
-
-                if (car == null) {
-                    return Mono.error(new IllegalArgumentException("Device " + deviceName + " not found"));
-                }
+                Car car = carService.existCar(user.getId(), deviceName);
 
                 authContext.setCar(car);
 
@@ -147,5 +137,6 @@ public class DeviceStatusInterceptor implements WebSocketGraphQlInterceptor {
 
     @Override
     public void handleConnectionClosed(@NotNull WebSocketSessionInfo sessionInfo, int statusCode, @NotNull Map<String, Object> connectionInitPayload) {
+        webSocketConnectionManager.unregisterSession(sessionInfo.getId());
     }
 }

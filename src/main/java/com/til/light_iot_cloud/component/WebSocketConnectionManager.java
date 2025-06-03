@@ -2,7 +2,7 @@ package com.til.light_iot_cloud.component;
 
 import com.til.light_iot_cloud.context.DeviceContext;
 import com.til.light_iot_cloud.context.Publisher;
-import com.til.light_iot_cloud.data.AuthContext;
+import com.til.light_iot_cloud.context.AuthContext;
 import jakarta.annotation.Nullable;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
