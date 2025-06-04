@@ -231,7 +231,7 @@ type CarMutation {
 #设备使用
 type Subscription {
 
-    updateConfiguration : UpdateConfiguration
+    updateConfiguration : UpdateConfigurationEvent
 }
 
 # web
@@ -241,7 +241,7 @@ extend type Subscription {
 
 }
 
-type UpdateConfiguration{
+type UpdateConfigurationEvent{
     key : String!
     value : String!
 }
@@ -250,7 +250,7 @@ type DeviceOnlineStateSwitchEvent {
 
     onlineState : OnlineState!
     deviceType : DeviceType!
-    id : ID!
+    deviceId : ID!
 
     # 如果作为灯则非空
     light: Light

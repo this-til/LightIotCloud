@@ -10,18 +10,16 @@ import java.time.ZoneOffset;
 @Data
 @AllArgsConstructor
 public class TimeRange {
-    public static final OffsetDateTime MIN_TIME = OffsetDateTime.ofInstant(Instant.MIN, ZoneOffset.UTC);
-    public static final OffsetDateTime MAX_TIME = OffsetDateTime.ofInstant(Instant.MAX, ZoneOffset.UTC);
 
     OffsetDateTime start;
     OffsetDateTime end;
 
     public void standard() {
         if (start == null) {
-            start = MIN_TIME;
+            start = OffsetDateTime.MIN;
         }
         if (end == null) {
-            end = MAX_TIME;
+            end = OffsetDateTime.MAX;
         }
         if (start.isAfter(end)) {
             OffsetDateTime c = end;

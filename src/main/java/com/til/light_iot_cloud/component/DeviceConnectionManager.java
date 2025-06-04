@@ -4,6 +4,7 @@ import com.til.light_iot_cloud.context.DeviceContext;
 import com.til.light_iot_cloud.context.Publisher;
 import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.enums.DeviceType;
+import com.til.light_iot_cloud.enums.LinkType;
 import com.til.light_iot_cloud.enums.OnlineState;
 import com.til.light_iot_cloud.event.DeviceOnlineStateSwitchEvent;
 import jakarta.annotation.Nullable;
@@ -12,6 +13,7 @@ import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
+import org.springframework.graphql.server.WebSocketSessionInfo;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -19,33 +21,37 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class DeviceConnectionManager implements ApplicationListener<DeviceOnlineStateSwitchEvent> {
+public class DeviceConnectionManager {
 
     @Resource
     private ApplicationEventPublisher applicationEventPublisher;
 
-    private final Map<String, Publisher> sessions = new ConcurrentHashMap<>();
+    private final Map<String, AuthContext> sessions = new ConcurrentHashMap<>();
 
-    private final Map<Long, DeviceContext> lightSessions = new ConcurrentHashMap<>();
-    private final Map<Long, DeviceContext> carSessions = new ConcurrentHashMap<>();
+    private final Map<Long, Map<String, WebSocketSessionInfo>> lightSessions = new ConcurrentHashMap<>();
+    private final Map<Long, Map<String, WebSocketSessionInfo>> carSessions = new ConcurrentHashMap<>();
 
     public void registerSession(AuthContext authContext) {
-        WebSocketSession webSocketSession = authContext.getWebSocketSession();
 
-        String socketId = webSocketSession.getId();
+        LinkType linkType = authContext.getLinkType();
+        if (linkType != LinkType.DEVICE_WEBSOCKET) {
+            throw new IllegalArgumentException("Unsupported link type: " + linkType);
+        }
+
+        WebSocketSessionInfo webSocketSessionInfo = authContext.getWebSocketSessionInfo();
+
+        String socketId = webSocketSessionInfo.getId();
 
         if (sessions.containsKey(socketId)) {
             return;
         }
 
-        Publisher publisher = new Publisher(authContext);
+        sessions.put(socketId, authContext);
 
-        sessions.put(socketId, publisher);
-
-        switch (authContext.getLinkType()) {
-            case WEBSOCKET_LIGHT -> {
+        switch (authContext.getDeviceType()) {
+            case LIGHT -> {
                 Long id = authContext.getLight().getId();
-                DeviceContext deviceContext = lightSessions.computeIfAbsent(id, _ -> {
+                Map<String, WebSocketSessionInfo> map = lightSessions.computeIfAbsent(id, _ -> {
                     applicationEventPublisher.publishEvent(
                             new DeviceOnlineStateSwitchEvent(
                                     this,
@@ -54,13 +60,13 @@ public class DeviceConnectionManager implements ApplicationListener<DeviceOnline
                                     id
                             )
                     );
-                    return new DeviceContext();
+                    return new ConcurrentHashMap<>();
                 });
-                deviceContext.register(publisher);
+                map.put(socketId, webSocketSessionInfo);
             }
-            case WEBSOCKET_CAR -> {
+            case CAR -> {
                 Long id = authContext.getCar().getId();
-                DeviceContext deviceContext = carSessions.computeIfAbsent(id, _ -> {
+                Map<String, WebSocketSessionInfo> map = carSessions.computeIfAbsent(id, _ -> {
                     applicationEventPublisher.publishEvent(
                             new DeviceOnlineStateSwitchEvent(
                                     this,
@@ -69,9 +75,9 @@ public class DeviceConnectionManager implements ApplicationListener<DeviceOnline
                                     id
                             )
                     );
-                    return new DeviceContext();
+                    return new ConcurrentHashMap<>();
                 });
-                deviceContext.register(publisher);
+                map.put(socketId, webSocketSessionInfo);
             }
         }
 
@@ -84,21 +90,19 @@ public class DeviceConnectionManager implements ApplicationListener<DeviceOnline
             return;
         }
 
-        Publisher publisher = sessions.remove(sessionId);
+        AuthContext authContext = sessions.remove(sessionId);
 
-        if (publisher == null) {
+        if (authContext == null) {
             return;
         }
 
-        AuthContext authContext = publisher.getAuthContext();
-
-        switch (authContext.getLinkType()) {
-            case WEBSOCKET_LIGHT -> {
+        switch (authContext.getDeviceType()) {
+            case LIGHT -> {
                 Long id = authContext.getLight().getId();
                 if (lightSessions.containsKey(id)) {
-                    DeviceContext deviceContext = lightSessions.get(id);
-                    deviceContext.unregister(publisher);
-                    if (deviceContext.isEmpty()) {
+                    Map<String, WebSocketSessionInfo> map = lightSessions.get(id);
+                    map.remove(sessionId);
+                    if (map.isEmpty()) {
                         lightSessions.remove(id);
                         applicationEventPublisher.publishEvent(
                                 new DeviceOnlineStateSwitchEvent(
@@ -111,50 +115,40 @@ public class DeviceConnectionManager implements ApplicationListener<DeviceOnline
                     }
                 }
             }
-            case WEBSOCKET_CAR -> {
+            case CAR -> {
                 Long id = authContext.getCar().getId();
                 if (carSessions.containsKey(id)) {
-                    carSessions.get(id).unregister(publisher);
-                    if (carSessions.get(id).isEmpty()) {
+                    Map<String, WebSocketSessionInfo> map = carSessions.get(id);
+                    map.remove(sessionId);
+                    if (map.isEmpty()) {
                         carSessions.remove(id);
+                        applicationEventPublisher.publishEvent(
+                                new DeviceOnlineStateSwitchEvent(
+                                        this,
+                                        OnlineState.OFFLINE,
+                                        DeviceType.CAR,
+                                        id
+                                )
+                        );
                     }
-                    applicationEventPublisher.publishEvent(
-                            new DeviceOnlineStateSwitchEvent(
-                                    this,
-                                    OnlineState.OFFLINE,
-                                    DeviceType.CAR,
-                                    id
-                            )
-                    );
                 }
             }
-        }
-
-        if (!publisher.isReleased()) {
-            publisher.release();
         }
     }
 
     @Nullable
-    public Publisher getPublisherBySession(String sessionId) {
+    public AuthContext getPublisherBySession(String sessionId) {
         return sessions.get(sessionId);
     }
 
     @Nullable
-    public DeviceContext getPublisherByLightId(Long lightId) {
+    public Map<String, WebSocketSessionInfo> getPublisherByLightId(Long lightId) {
         return lightSessions.get(lightId);
     }
 
     @Nullable
-    public DeviceContext getPublisherByCarId(Long carId) {
+    public Map<String, WebSocketSessionInfo> getPublisherByCarId(Long carId) {
         return carSessions.get(carId);
     }
 
-    @Override
-    public void onApplicationEvent(@NotNull DeviceOnlineStateSwitchEvent event) {
-        DeviceType deviceType = event.getDeviceType();
-
-
-
-    }
 }

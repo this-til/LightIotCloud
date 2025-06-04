@@ -21,6 +21,7 @@ public class Result<T> {
                 : message, null);
     }
 
+
     public static <T> Result<T> fail(@Nullable String message) {
         return new Result<>(ResultType.FAIL, message == null
                 ? ""
@@ -31,6 +32,18 @@ public class Result<T> {
         return new Result<>(ResultType.ERROR, message == null
                 ? ""
                 : message, null);
+    }
+
+    public static <T> Result<T> successful() {
+        return successful(null);
+    }
+
+    public static <T> Result<T> fail() {
+        return fail(null);
+    }
+
+    public static <T> Result<T> error() {
+        return error(null);
     }
 
     public static <T> Result<T> ofBool(boolean success, @Nullable String successMessage, @Nullable String failureMessage) {

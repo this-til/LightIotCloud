@@ -3,9 +3,11 @@ package com.til.light_iot_cloud.context;
 import com.til.light_iot_cloud.data.Car;
 import com.til.light_iot_cloud.data.Light;
 import com.til.light_iot_cloud.data.User;
+import com.til.light_iot_cloud.enums.DeviceType;
 import com.til.light_iot_cloud.enums.LinkType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.graphql.server.WebSocketSessionInfo;
 import org.springframework.web.socket.WebSocketSession;
 
 @Data
@@ -14,6 +16,8 @@ public class AuthContext {
     LinkType linkType;
 
     User user;
+
+    DeviceType deviceType;
 
     /***
      * 作为灯杆登入
@@ -32,9 +36,20 @@ public class AuthContext {
      * Nullable
      */
     WebSocketSession webSocketSession;
+    WebSocketSessionInfo webSocketSessionInfo;
 
     public AuthContext(LinkType linkType, User user) {
         this.linkType = linkType;
         this.user = user;
+    }
+
+    public Long getDeviceId() {
+        if (deviceType == DeviceType.LIGHT) {
+            return light.getId();
+        }
+        if (deviceType == DeviceType.CAR) {
+            return car.getId();
+        }
+        return -1L;
     }
 }

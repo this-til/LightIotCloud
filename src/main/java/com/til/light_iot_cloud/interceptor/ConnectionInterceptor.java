@@ -4,6 +4,7 @@ import com.til.light_iot_cloud.component.DeviceConnectionManager;
 import com.til.light_iot_cloud.config.JwtTokenConfig;
 import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.data.*;
+import com.til.light_iot_cloud.enums.DeviceType;
 import com.til.light_iot_cloud.enums.LinkType;
 import com.til.light_iot_cloud.service.CarService;
 import com.til.light_iot_cloud.service.LightService;
@@ -22,13 +23,15 @@ import java.util.Map;
 import java.util.Objects;
 
 @Component
-public class DeviceStatusInterceptor implements WebSocketGraphQlInterceptor {
+public class ConnectionInterceptor implements WebSocketGraphQlInterceptor {
+
 
     public static final String AUTHORIZATION = "Authorization";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String DEVICE_NAME = "deviceName";
     public static final String LINK_TYPE = LinkType.KEY;
+    public static final String DEVICE_TYPE = DeviceType.KEY;
     public static final String AUTH_CONTEXT = "authContext";
 
     @Resource
@@ -78,13 +81,6 @@ public class DeviceStatusInterceptor implements WebSocketGraphQlInterceptor {
             return Mono.error(new IllegalArgumentException("user verification incorrect"));
         }
 
-        if (!payload.containsKey(LINK_TYPE)) {
-            info.getAttributes().put(LINK_TYPE, LinkType.WEBSOCKET);
-            AuthContext authContext = new AuthContext(LinkType.WEBSOCKET, user);
-            info.getAttributes().put(AUTH_CONTEXT, authContext);
-            return Mono.just(payload);
-        }
-
         String linkTypeStr = Objects.requireNonNullElse(payload.get(LINK_TYPE), "").toString();
 
         if (linkTypeStr.isEmpty()) {
@@ -92,6 +88,7 @@ public class DeviceStatusInterceptor implements WebSocketGraphQlInterceptor {
         }
 
         LinkType linkType;
+
         try {
             linkType = LinkType.valueOf(linkTypeStr);
         } catch (IllegalArgumentException e) {
@@ -103,14 +100,24 @@ public class DeviceStatusInterceptor implements WebSocketGraphQlInterceptor {
         }
 
         if (linkType == LinkType.WEBSOCKET) {
-            info.getAttributes().put(LINK_TYPE, LinkType.WEBSOCKET);
             AuthContext authContext = new AuthContext(LinkType.WEBSOCKET, user);
+            info.getAttributes().put(LINK_TYPE, LinkType.WEBSOCKET);
             info.getAttributes().put(AUTH_CONTEXT, authContext);
             return Mono.just(payload);
         }
 
-        if (!payload.containsKey(DEVICE_NAME)) {
-            return Mono.error(new IllegalArgumentException("Device name is missing"));
+        String deviceTypeStr = Objects.requireNonNullElse(payload.get(DEVICE_TYPE), "").toString();
+
+        if (deviceTypeStr.isEmpty()) {
+            return Mono.error(new IllegalArgumentException("Device type cannot be empty"));
+        }
+
+        DeviceType deviceType;
+
+        try {
+            deviceType = DeviceType.valueOf(deviceTypeStr);
+        } catch (IllegalArgumentException e) {
+            return Mono.error(new IllegalArgumentException("Invalid device type: " + deviceTypeStr));
         }
 
         String deviceName = Objects.requireNonNullElse(payload.get(DEVICE_NAME), "").toString();
@@ -119,34 +126,29 @@ public class DeviceStatusInterceptor implements WebSocketGraphQlInterceptor {
             return Mono.error(new IllegalArgumentException("Device name is missing"));
         }
 
-
         Field sessionField = info.getClass().getDeclaredField("session");
         sessionField.setAccessible(true);
         WebSocketSession session = (WebSocketSession) sessionField.get(info);
 
 
-        AuthContext authContext = new AuthContext(LinkType.WEBSOCKET_LIGHT, user);
+        AuthContext authContext = new AuthContext(LinkType.DEVICE_WEBSOCKET, user);
         authContext.setWebSocketSession(session);
+        authContext.setWebSocketSessionInfo(info);
+        authContext.setDeviceType(deviceType);
 
-        switch (linkType) {
-            case WEBSOCKET_LIGHT -> {
+        info.getAttributes().put(LINK_TYPE, LinkType.DEVICE_WEBSOCKET);
+        info.getAttributes().put(DEVICE_TYPE, deviceTypeStr);
+
+        switch (deviceType) {
+            case LIGHT -> {
                 Light light = lightService.existLight(user.getId(), deviceName);
-
                 authContext.setLight(light);
-
-                info.getAttributes().put(LINK_TYPE, LinkType.WEBSOCKET_LIGHT);
                 info.getAttributes().put(AUTH_CONTEXT, authContext);
             }
-            case WEBSOCKET_CAR -> {
+            case CAR -> {
                 Car car = carService.existCar(user.getId(), deviceName);
-
                 authContext.setCar(car);
-
-                info.getAttributes().put(LINK_TYPE, LinkType.WEBSOCKET_CAR);
                 info.getAttributes().put(AUTH_CONTEXT, authContext);
-            }
-            default -> {
-                return Mono.error(new IllegalArgumentException("Invalid link type: " + linkTypeStr));
             }
         }
 

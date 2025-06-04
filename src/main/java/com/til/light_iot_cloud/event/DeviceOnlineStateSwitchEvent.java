@@ -6,7 +6,7 @@ import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 @Getter
-public class DeviceOnlineStateSwitchEvent extends ApplicationEvent {
+public class DeviceOnlineStateSwitchEvent extends ApplicationEvent implements ISinksEvent {
 
     OnlineState onlineState;
     DeviceType deviceType;
@@ -18,4 +18,5 @@ public class DeviceOnlineStateSwitchEvent extends ApplicationEvent {
         this.deviceType = deviceType;
         this.id = id;
     }
+
 }

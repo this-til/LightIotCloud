@@ -1,15 +1,20 @@
 package com.til.light_iot_cloud.controller.mutation;
 
 import com.til.light_iot_cloud.component.DeviceConnectionManager;
+import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.context.DeviceContext;
 import com.til.light_iot_cloud.data.*;
 import com.til.light_iot_cloud.data.input.DetectionInput;
 import com.til.light_iot_cloud.data.input.DetectionItemInput;
-import com.til.light_iot_cloud.data.subscription.UpdateConfiguration;
+import com.til.light_iot_cloud.enums.DeviceType;
+import com.til.light_iot_cloud.event.UpdateConfigurationEvent;
 import com.til.light_iot_cloud.service.*;
 import com.til.light_iot_cloud.type.ISubscriptionType;
 import jakarta.annotation.Resource;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.ContextValue;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +44,9 @@ public class LightMutationController {
 
     @Resource
     private DeviceConnectionManager deviceConnectionManager;
+
+    @Resource
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @SchemaMapping(typeName = "LightMutation")
     public Result<Void> reportUpdate(Light light, @Argument LightData lightDataInput) {
@@ -108,27 +116,8 @@ public class LightMutationController {
 
     @SchemaMapping(typeName = "LightMutation")
     public Result<Void> setConfiguration(Light light, @Argument String key, @Argument String value) {
-
-        Long id = light.getId();
-
-        DeviceContext deviceContext = deviceConnectionManager.getPublisherByLightId(id);
-
-        if (deviceContext == null) {
-            return Result.error("light is not online");
-        }
-
-        List<Sinks.Many<UpdateConfiguration>> subscription = deviceContext.findSubscription(ISubscriptionType.updateConfiguration);
-
-        if (subscription == null || subscription.isEmpty()) {
-            return Result.error("no subscription found");
-        }
-
-        for(Sinks.Many<UpdateConfiguration> updateConfigurationMany : subscription) {
-            updateConfigurationMany.tryEmitNext(new UpdateConfiguration(key, value));
-        }
-
-        return Result.ofBool(true);
-
+        applicationEventPublisher.publishEvent(new UpdateConfigurationEvent(this, DeviceType.LIGHT, light.getId(), key, value));
+        return Result.successful();
     }
 
     @SchemaMapping(typeName = "LightMutation")
@@ -140,7 +129,6 @@ public class LightMutationController {
     public Result<Void> setSwitch(Light light, @Argument Boolean value) {
         return setConfiguration(light, "Device.Switch", value.toString());
     }
-
 
 
 }

@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+@Deprecated
 public class DeviceContext {
 
     final Map<String, Publisher> publisherMap = new ConcurrentHashMap<>();

@@ -9,6 +9,7 @@ import reactor.core.publisher.Sinks;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Deprecated
 public class Publisher {
     @Getter
     AuthContext authContext;
@@ -82,9 +83,10 @@ public class Publisher {
             if (!subscriptionMap.isEmpty()) {
                 subscriptionMap.values().forEach(Sinks.Many::tryEmitComplete);
             }
-            if (authContext.getWebSocketSession().isOpen()) {
+            subscriptionMap.clear();
+            /*if (authContext.getWebSocketSession().isOpen()) {
                 authContext.getWebSocketSession().close();
-            }
+            }*/
         }
     }
 

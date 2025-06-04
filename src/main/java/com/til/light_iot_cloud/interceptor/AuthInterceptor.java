@@ -26,7 +26,7 @@ public class AuthInterceptor implements WebGraphQlInterceptor {
     @Override
     public @NotNull Mono<WebGraphQlResponse> intercept(WebGraphQlRequest request, @NotNull Chain chain) {
 
-        if (request.getAttributes().get(DeviceStatusInterceptor.AUTH_CONTEXT) instanceof AuthContext authContext) {
+        if (request.getAttributes().get(ConnectionInterceptor.AUTH_CONTEXT) instanceof AuthContext authContext) {
             request.configureExecutionInput(
                     (executionInput, builder) ->
                             builder.graphQLContext(

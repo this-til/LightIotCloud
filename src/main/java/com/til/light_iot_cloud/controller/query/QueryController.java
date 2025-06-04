@@ -2,6 +2,7 @@ package com.til.light_iot_cloud.controller.query;
 
 import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.data.*;
+import com.til.light_iot_cloud.enums.DeviceType;
 import com.til.light_iot_cloud.enums.LinkType;
 import com.til.light_iot_cloud.service.UserService;
 import jakarta.annotation.Resource;
@@ -33,16 +34,22 @@ public class QueryController {
 
     @QueryMapping
     public Light lightSelf(@ContextValue AuthContext authContext) {
-        if (authContext.getLinkType() != LinkType.WEBSOCKET_LIGHT) {
-            throw new SecurityException("You are not logged in");
+        if (authContext.getLinkType() != LinkType.DEVICE_WEBSOCKET) {
+            throw new IllegalArgumentException("linkType is not DEVICE_WEBSOCKET");
+        }
+        if (authContext.getDeviceType() != DeviceType.LIGHT) {
+            throw new IllegalArgumentException("deviceType is not LIGHT");
         }
         return authContext.getLight();
     }
 
     @QueryMapping
     public Car carSelf(@ContextValue AuthContext authContext) {
-        if (authContext.getLinkType() != LinkType.WEBSOCKET_CAR) {
-            throw new SecurityException("You are not logged in");
+        if (authContext.getLinkType() != LinkType.DEVICE_WEBSOCKET) {
+            throw new IllegalArgumentException("linkType is not DEVICE_WEBSOCKET");
+        }
+        if (authContext.getDeviceType() != DeviceType.CAR) {
+            throw new IllegalArgumentException("deviceType is not CAR");
         }
         return authContext.getCar();
     }
