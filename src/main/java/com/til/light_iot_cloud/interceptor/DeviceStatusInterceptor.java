@@ -1,6 +1,7 @@
 package com.til.light_iot_cloud.interceptor;
 
-import com.til.light_iot_cloud.component.WebSocketConnectionManager;
+import com.til.light_iot_cloud.component.DeviceConnectionManager;
+import com.til.light_iot_cloud.config.JwtTokenConfig;
 import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.data.*;
 import com.til.light_iot_cloud.enums.LinkType;
@@ -23,6 +24,7 @@ import java.util.Objects;
 @Component
 public class DeviceStatusInterceptor implements WebSocketGraphQlInterceptor {
 
+    public static final String AUTHORIZATION = "Authorization";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String DEVICE_NAME = "deviceName";
@@ -39,24 +41,41 @@ public class DeviceStatusInterceptor implements WebSocketGraphQlInterceptor {
     private UserService userService;
 
     @Resource
-    private WebSocketConnectionManager webSocketConnectionManager;
+    private DeviceConnectionManager deviceConnectionManager;
+
+    @Resource
+    private JwtTokenConfig jwtTokenConfig;
 
 
     @SneakyThrows
     @Override
     public @NotNull Mono<Object> handleConnectionInitialization(@NotNull WebSocketSessionInfo info, Map<String, Object> payload) {
+        String authorization = Objects.requireNonNullElse(payload.get(AUTHORIZATION), "").toString();
 
         String username = Objects.requireNonNullElse(payload.get(USERNAME), "").toString();
         String password = Objects.requireNonNullElse(payload.get(PASSWORD), "").toString();
+        User user;
 
-        if (username.isEmpty() || password.isEmpty()) {
-            return Mono.error(new IllegalArgumentException("Username and password cannot be empty"));
+        if (!username.isEmpty() && !password.isEmpty()) {
+            user = userService.temporary(username, password);
+        } else if (!authorization.isEmpty()) {
+
+            Long userId;
+
+            try {
+                userId = jwtTokenConfig.parseJwt(authorization);
+            } catch (Exception e) {
+                return Mono.error(e);
+            }
+
+            user = userService.getUserById(userId);
+
+        } else {
+            return Mono.error(new IllegalArgumentException("identity verification failed"));
         }
 
-        User user = userService.temporary(username, password);
-
         if (user == null) {
-            return Mono.error(new IllegalArgumentException("Username or password is incorrect"));
+            return Mono.error(new IllegalArgumentException("user verification incorrect"));
         }
 
         if (!payload.containsKey(LINK_TYPE)) {
@@ -131,12 +150,12 @@ public class DeviceStatusInterceptor implements WebSocketGraphQlInterceptor {
             }
         }
 
-        webSocketConnectionManager.registerSession(authContext);
+        deviceConnectionManager.registerSession(authContext);
         return Mono.just(payload);
     }
 
     @Override
     public void handleConnectionClosed(@NotNull WebSocketSessionInfo sessionInfo, int statusCode, @NotNull Map<String, Object> connectionInitPayload) {
-        webSocketConnectionManager.unregisterSession(sessionInfo.getId());
+        deviceConnectionManager.unregisterSession(sessionInfo.getId());
     }
 }

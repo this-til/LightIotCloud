@@ -37,6 +37,15 @@ input TimeRange {
     end : DateTime
 }
 
+enum DeviceType {
+    CAR
+    LIGHT
+}
+
+enum OnlineState {
+    ONLINE
+    OFFLINE
+}
 
 # -----------------------Com-----------------------
 
@@ -175,8 +184,17 @@ type UserMutation {
 type LightMutation {
     reportUpdate(lightDataInput : LightDataInput) : Result
     reportDetection(detectionInput : DetectionInput) : Result
+
+    setConfiguration(key : String, value : String) : Result
+
+    # 设置亮度
+    setGear(value : Int) : Result
+
+    # 设置自动亮度调节
+    setSwitch(value : Boolean) : Result
 }
 
+# noinspection GraphQLUnresolvedReference,GraphQLMissingType
 input DetectionInput  {
     items : [DetectionItemInput]
     image : Upload
@@ -210,14 +228,38 @@ type CarMutation {
 
 # -----------------------Subscription-----------------------
 
+#设备使用
 type Subscription {
-    updateConfiguration : WebSocketConnectionManager
+
+    updateConfiguration : UpdateConfiguration
 }
 
-type WebSocketConnectionManager{
+# web
+extend type Subscription {
+
+    deviceOnlineStateSwitchEvent : DeviceOnlineStateSwitchEvent
+
+}
+
+type UpdateConfiguration{
     key : String!
     value : String!
 }
+
+type DeviceOnlineStateSwitchEvent {
+
+    onlineState : OnlineState!
+    deviceType : DeviceType!
+    id : ID!
+
+    # 如果作为灯则非空
+    light: Light
+
+    # 如果作为车则非空
+    car : Car
+}
+
+
 
 # -----------------------Subscription-----------------------
 

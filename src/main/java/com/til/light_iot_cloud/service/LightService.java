@@ -41,6 +41,14 @@ public interface LightService extends IService<Light> {
         );
     }
 
+    @Nullable
+    default Light getLightById(Long id) {
+        return getOne(
+                new LambdaQueryWrapper<Light>()
+                        .eq(Light::getId, id)
+        );
+    }
+
 
     default Light registerLight(Long userId, String name) {
         Light light = getLightByName(userId, name);

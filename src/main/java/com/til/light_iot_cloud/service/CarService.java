@@ -40,6 +40,14 @@ public interface CarService extends IService<Car> {
         );
     }
 
+    @Nullable
+    default Car getCarById(Long id) {
+        return getOne(
+                new LambdaQueryWrapper<Car>()
+                        .eq(Car::getId, id)
+        );
+    }
+
     default Car registerCar(Long userId, String name) {
         Car car = getCarByName(userId, name);
 
