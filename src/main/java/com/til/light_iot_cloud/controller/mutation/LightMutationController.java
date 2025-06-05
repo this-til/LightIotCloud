@@ -1,24 +1,21 @@
 package com.til.light_iot_cloud.controller.mutation;
 
 import com.til.light_iot_cloud.component.DeviceConnectionManager;
-import com.til.light_iot_cloud.context.AuthContext;
-import com.til.light_iot_cloud.context.DeviceContext;
+import com.til.light_iot_cloud.component.DeviceRunManager;
+import com.til.light_iot_cloud.context.LightContext;
 import com.til.light_iot_cloud.data.*;
 import com.til.light_iot_cloud.data.input.DetectionInput;
 import com.til.light_iot_cloud.data.input.DetectionItemInput;
+import com.til.light_iot_cloud.data.input.LightStateInput;
 import com.til.light_iot_cloud.enums.DeviceType;
 import com.til.light_iot_cloud.event.UpdateConfigurationEvent;
 import com.til.light_iot_cloud.service.*;
-import com.til.light_iot_cloud.type.ISubscriptionType;
 import jakarta.annotation.Resource;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.ContextValue;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Sinks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +43,12 @@ public class LightMutationController {
     private DeviceConnectionManager deviceConnectionManager;
 
     @Resource
+    private DeviceRunManager deviceRunManager;
+
+    @Resource
+    private ImageStorageService imageStorageService;
+
+    @Resource
     private ApplicationEventPublisher applicationEventPublisher;
 
     @SchemaMapping(typeName = "LightMutation")
@@ -55,14 +58,33 @@ public class LightMutationController {
     }
 
     @SchemaMapping(typeName = "LightMutation")
+    public Result<Void> reportState(Light light, @Argument LightStateInput lightStateInput) {
+        LightContext lightContext = deviceRunManager.getLightContext(light.getId());
+
+        if (lightContext == null) {
+            return Result.error("light not online");
+        }
+
+        lightContext.setLightStateInput(lightStateInput);
+
+        return Result.successful();
+    }
+
+    @SchemaMapping(typeName = "LightMutation")
     @Transactional
     public Result<Void> reportDetection(Light light, @Argument DetectionInput detectionInput) {
 
         DetectionKeyframe detectionKeyframe = new DetectionKeyframe();
 
-        detectionKeyframe.setLightId(light.getId());
+        String url = imageStorageService.storeImage(detectionInput.getImage());
 
+        detectionKeyframe.setLightId(light.getId());
+        detectionKeyframe.setUrl(url);
         detectionKeyframeService.save(detectionKeyframe);
+
+        if (detectionInput.getItems().isEmpty()) {
+            return Result.successful();
+        }
 
         List<DetectionItemInput> items = detectionInput.getItems();
 
@@ -78,6 +100,10 @@ public class LightMutationController {
             DetectionModel detectionModel = stringDetectionModelMap.get(entry.getKey());
 
             List<DetectionItemInput> value = entry.getValue();
+
+            if (value.isEmpty()) {
+                continue;
+            }
 
             Map<String, List<DetectionItemInput>> itemMap = value.stream()
                     .collect(Collectors.groupingBy(DetectionItemInput::getItem));

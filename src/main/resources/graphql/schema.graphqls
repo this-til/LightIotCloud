@@ -47,9 +47,26 @@ enum OnlineState {
     OFFLINE
 }
 
+type MatPack {
+    width : Int
+    height : Int
+    channels : Int
+
+    image : Bytes
+}
+
+input MatInput {
+    width : Int
+    height : Int
+    channels : Int
+
+    image : Bytes
+}
+
 # -----------------------Com-----------------------
 
 # -----------------------Query-----------------------
+
 type Query {
 
     self : User!
@@ -93,6 +110,9 @@ type Light {
 
     online : Boolean
 
+    # 离线时为 null
+    lightState : LightState
+
     datas(timeRange : TimeRange) : [LightData!]!
     detectionKeyframes(page : Page, timeRange : TimeRange) : [DetectionKeyframe!]!
 }
@@ -111,6 +131,12 @@ type LightData {
     windSpeed : Float
     windDirection : Float
 }
+
+type LightState {
+    enableWirelessCharging : Boolean
+    wirelessChargingPower : Float
+}
+
 
 type DetectionKeyframe {
     id : ID!
@@ -183,6 +209,7 @@ type UserMutation {
 
 type LightMutation {
     reportUpdate(lightDataInput : LightDataInput) : Result
+    reportState(lightStateInput : LightStateInput) : Result
     reportDetection(detectionInput : DetectionInput) : Result
 
     setConfiguration(key : String, value : String) : Result
@@ -210,6 +237,11 @@ input DetectionItemInput {
     probability : Float!
 }
 
+input LightStateInput {
+    enableWirelessCharging : Boolean
+    wirelessChargingPower : Float
+}
+
 input LightDataInput  {
     humidity : Float
     temperature : Float
@@ -221,7 +253,18 @@ input LightDataInput  {
 }
 
 type CarMutation {
-    id : ID
+    operationCar(operationCarInput : OperationCarInput) : Result
+}
+
+input OperationCarInput {
+
+    translationAdvance : Boolean
+    translationLeft : Boolean
+    translationRetreat : Boolean
+    translationRight : Boolean
+    angularLeft : Boolean
+    angularRight : Boolean
+    stop : Boolean
 }
 
 # -----------------------Mutation-----------------------
@@ -231,11 +274,16 @@ type CarMutation {
 #设备使用
 type Subscription {
 
-    updateConfiguration : UpdateConfigurationEvent
+    updateConfigurationEvent : UpdateConfigurationEvent
+
+    # car
+    operationCarEvent : OperationCarEvent
 }
 
 # web
 extend type Subscription {
+
+    testSubscription : String
 
     deviceOnlineStateSwitchEvent : DeviceOnlineStateSwitchEvent
 
@@ -244,6 +292,16 @@ extend type Subscription {
 type UpdateConfigurationEvent{
     key : String!
     value : String!
+}
+
+type OperationCarEvent {
+    translationAdvance : Boolean
+    translationLeft : Boolean
+    translationRetreat : Boolean
+    translationRight : Boolean
+    angularLeft : Boolean
+    angularRight : Boolean
+    stop : Boolean
 }
 
 type DeviceOnlineStateSwitchEvent {
@@ -258,6 +316,7 @@ type DeviceOnlineStateSwitchEvent {
     # 如果作为车则非空
     car : Car
 }
+
 
 
 

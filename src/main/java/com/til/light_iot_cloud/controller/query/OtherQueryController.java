@@ -23,7 +23,7 @@ public class OtherQueryController {
         if (deviceOnlineStateSwitchEvent.getDeviceType() != DeviceType.LIGHT) {
             return null;
         }
-        return lightService.getLightById(deviceOnlineStateSwitchEvent.getId());
+        return lightService.getLightById(deviceOnlineStateSwitchEvent.getDeviceId());
     }
 
 
@@ -32,6 +32,6 @@ public class OtherQueryController {
         if (deviceOnlineStateSwitchEvent.getDeviceType() != DeviceType.CAR) {
             return null;
         }
-        return carService.getCarById(deviceOnlineStateSwitchEvent.getId());
+        return carService.getCarById(deviceOnlineStateSwitchEvent.getDeviceId());
     }
 }

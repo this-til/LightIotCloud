@@ -4,6 +4,7 @@ package com.til.light_iot_cloud.controller.query;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.til.light_iot_cloud.component.DeviceConnectionManager;
+import com.til.light_iot_cloud.component.DeviceRunManager;
 import com.til.light_iot_cloud.data.*;
 import com.til.light_iot_cloud.data.input.TimeRange;
 import com.til.light_iot_cloud.service.*;
@@ -34,12 +35,13 @@ public class LightController {
     private DetectionService detectionService;
 
     @Resource
-    private DeviceConnectionManager deviceConnectionManager;
+    private DeviceRunManager deviceRunManager;
 
 
     @SchemaMapping(typeName = "Light")
     public boolean online(Light light) {
-        return deviceConnectionManager.getPublisherByLightId(light.getId()) != null;
+        //return deviceConnectionManager.getPublisherByLightId(light.getId()) != null;
+        return deviceRunManager.getLightContext(light.getId()) != null;
     }
 
     @SchemaMapping(typeName = "Light")

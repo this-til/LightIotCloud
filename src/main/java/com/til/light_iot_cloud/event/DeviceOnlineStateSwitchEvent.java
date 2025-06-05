@@ -10,13 +10,13 @@ public class DeviceOnlineStateSwitchEvent extends ApplicationEvent implements IS
 
     OnlineState onlineState;
     DeviceType deviceType;
-    Long id;
+    Long deviceId;
 
-    public DeviceOnlineStateSwitchEvent(Object source, OnlineState onlineState, DeviceType deviceType, Long id) {
+    public DeviceOnlineStateSwitchEvent(Object source, OnlineState onlineState, DeviceType deviceType, Long deviceId) {
         super(source);
         this.onlineState = onlineState;
         this.deviceType = deviceType;
-        this.id = id;
+        this.deviceId = deviceId;
     }
 
 }

@@ -10,10 +10,17 @@ import org.springframework.graphql.data.method.annotation.SubscriptionMapping;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
 
+import java.time.Duration;
+
 @Controller
 public class WebSubscriptionController {
     @Resource
     private EventSinkHolder eventSinkHolder;
+
+    @SubscriptionMapping
+    public Flux<String> testSubscription() {
+        return Flux.interval(Duration.ofSeconds(1)).map(Object::toString);
+    }
 
     @SubscriptionMapping
     public Flux<DeviceOnlineStateSwitchEvent> deviceOnlineStateSwitchEvent(@ContextValue AuthContext authContext) {

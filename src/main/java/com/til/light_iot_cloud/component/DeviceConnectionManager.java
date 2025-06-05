@@ -1,7 +1,5 @@
 package com.til.light_iot_cloud.component;
 
-import com.til.light_iot_cloud.context.DeviceContext;
-import com.til.light_iot_cloud.context.Publisher;
 import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.enums.DeviceType;
 import com.til.light_iot_cloud.enums.LinkType;
@@ -10,12 +8,9 @@ import com.til.light_iot_cloud.event.DeviceOnlineStateSwitchEvent;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationListener;
 import org.springframework.graphql.server.WebSocketSessionInfo;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.WebSocketSession;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

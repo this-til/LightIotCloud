@@ -1,6 +1,7 @@
 package com.til.light_iot_cloud.controller.query;
 
 import com.til.light_iot_cloud.component.DeviceConnectionManager;
+import com.til.light_iot_cloud.component.DeviceRunManager;
 import com.til.light_iot_cloud.data.Car;
 import com.til.light_iot_cloud.service.CarService;
 import jakarta.annotation.Resource;
@@ -14,11 +15,11 @@ public class CarController {
     private CarService carService;
 
     @Resource
-    private DeviceConnectionManager deviceConnectionManager;
+    private DeviceRunManager deviceRunManager;
 
     @SchemaMapping(typeName = "Car")
     public boolean online(Car car) {
-        return deviceConnectionManager.getPublisherByCarId(car.getId()) != null;
+        return deviceRunManager.getCarContext(car.getId()) != null;
     }
 
 }
