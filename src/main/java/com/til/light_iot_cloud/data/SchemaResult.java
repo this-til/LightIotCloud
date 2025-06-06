@@ -23,10 +23,24 @@ public class SchemaResult {
     @Data
     public static class ExceptionInfo {
         String message;
+        List<Void> locations = List.of();
+        List<Void> path = List.of();
+        Extensions extensions;
 
         public ExceptionInfo(Exception e) {
             this.message = e.getMessage();
+            this.extensions = new Extensions(e.getClass().getSimpleName());
+        }
+
+        @Data
+        public static class Extensions {
+            String classification;
+
+            public Extensions(String classification) {
+                this.classification = classification;
+            }
         }
     }
+
 
 }

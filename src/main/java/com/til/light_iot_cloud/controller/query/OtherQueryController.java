@@ -10,6 +10,8 @@ import jakarta.annotation.Resource;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
+import java.util.Objects;
+
 @Controller
 public class OtherQueryController {
 
@@ -33,5 +35,13 @@ public class OtherQueryController {
             return null;
         }
         return carService.getCarById(deviceOnlineStateSwitchEvent.getDeviceId());
+    }
+
+    @SchemaMapping(typeName = "DeviceOnlineStateSwitchEvent")
+    public String deviceName(DeviceOnlineStateSwitchEvent deviceOnlineStateSwitchEvent) {
+        return switch (deviceOnlineStateSwitchEvent.getDeviceType()) {
+            case LIGHT -> lightService.getById(deviceOnlineStateSwitchEvent.getDeviceId()).getName();
+            case CAR -> carService.getById(deviceOnlineStateSwitchEvent.getDeviceId()).getName();
+        };
     }
 }

@@ -6,13 +6,16 @@ import com.til.light_iot_cloud.context.LightContext;
 import com.til.light_iot_cloud.data.*;
 import com.til.light_iot_cloud.data.input.DetectionInput;
 import com.til.light_iot_cloud.data.input.DetectionItemInput;
-import com.til.light_iot_cloud.data.input.LightStateInput;
+import com.til.light_iot_cloud.data.LightState;
 import com.til.light_iot_cloud.enums.DeviceType;
+import com.til.light_iot_cloud.event.LightDataReportEvent;
+import com.til.light_iot_cloud.event.LightStateReportEvent;
 import com.til.light_iot_cloud.event.UpdateConfigurationEvent;
 import com.til.light_iot_cloud.service.*;
 import jakarta.annotation.Resource;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.ContextValue;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,19 +56,28 @@ public class LightMutationController {
 
     @SchemaMapping(typeName = "LightMutation")
     public Result<Void> reportUpdate(Light light, @Argument LightData lightDataInput) {
-        lightDataInput.setLightId(light.getId());
-        return Result.ofBool(lightDataService.save(lightDataInput));
-    }
-
-    @SchemaMapping(typeName = "LightMutation")
-    public Result<Void> reportState(Light light, @Argument LightStateInput lightStateInput) {
         LightContext lightContext = deviceRunManager.getLightContext(light.getId());
 
         if (lightContext == null) {
             return Result.error("light not online");
         }
 
-        lightContext.setLightStateInput(lightStateInput);
+        lightDataInput.setLightId(light.getId());
+        applicationEventPublisher.publishEvent(new LightDataReportEvent(this, light.getId(), lightDataInput));
+        return Result.ofBool(lightDataService.save(lightDataInput));
+    }
+
+    @SchemaMapping(typeName = "LightMutation")
+    public Result<Void> reportState(Light light, @Argument LightState lightState) {
+        LightContext lightContext = deviceRunManager.getLightContext(light.getId());
+
+        if (lightContext == null) {
+            return Result.error("light not online");
+        }
+
+        lightContext.setLightState(lightState);
+
+        applicationEventPublisher.publishEvent(new LightStateReportEvent(this, light.getId(), lightState));
 
         return Result.successful();
     }

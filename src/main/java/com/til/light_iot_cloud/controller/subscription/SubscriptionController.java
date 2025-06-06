@@ -3,6 +3,7 @@ package com.til.light_iot_cloud.controller.subscription;
 import com.til.light_iot_cloud.component.DeviceConnectionManager;
 import com.til.light_iot_cloud.component.EventSinkHolder;
 import com.til.light_iot_cloud.context.AuthContext;
+import com.til.light_iot_cloud.data.input.OperationCarInput;
 import com.til.light_iot_cloud.enums.DeviceType;
 import com.til.light_iot_cloud.event.OperationCarEvent;
 import com.til.light_iot_cloud.event.UpdateConfigurationEvent;
@@ -40,7 +41,7 @@ public class SubscriptionController {
     }
 
     @SubscriptionMapping
-    public Flux<OperationCarEvent> operationCarEvent(@ContextValue AuthContext authContext) {
+    public Flux<OperationCarInput> operationCarEvent(@ContextValue AuthContext authContext) {
         LinkType linkType = authContext.getLinkType();
 
         if (linkType != LinkType.DEVICE_WEBSOCKET) {
@@ -56,6 +57,10 @@ public class SubscriptionController {
         return eventSinkHolder
                 .getSinks(OperationCarEvent.class)
                 .asFlux()
-                .filter(e -> e.getCarId().equals(id));
+                .filter(e -> e.getCarId().equals(id))
+                .map(OperationCarEvent::getOperationCarInput);
     }
+
+
+
 }

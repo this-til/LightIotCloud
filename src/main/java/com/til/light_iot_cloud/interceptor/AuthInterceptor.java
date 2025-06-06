@@ -42,7 +42,7 @@ public class AuthInterceptor implements WebGraphQlInterceptor {
                         builder.graphQLContext(
                                 contextBuilder -> {
                                     User user = null;
-                                    if (authHeader != null) {
+                                    if (authHeader != null && !authHeader.isEmpty()) {
                                         user = userService.getUserById(jwtTokenConfig.parseJwt(authHeader));
                                     }
                                     contextBuilder.put("authContext", new AuthContext(LinkType.HTTP, user));

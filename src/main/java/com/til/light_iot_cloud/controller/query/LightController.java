@@ -5,12 +5,18 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.til.light_iot_cloud.component.DeviceConnectionManager;
 import com.til.light_iot_cloud.component.DeviceRunManager;
+import com.til.light_iot_cloud.context.AuthContext;
+import com.til.light_iot_cloud.context.LightContext;
 import com.til.light_iot_cloud.data.*;
 import com.til.light_iot_cloud.data.input.TimeRange;
+import com.til.light_iot_cloud.enums.DeviceType;
+import com.til.light_iot_cloud.enums.LinkType;
 import com.til.light_iot_cloud.service.*;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.ContextValue;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
@@ -45,7 +51,15 @@ public class LightController {
     }
 
     @SchemaMapping(typeName = "Light")
+    public LightState lightState(@ContextValue AuthContext authContext, Light light) {
+        LightContext lightContext = deviceRunManager.getLightContext(light.getId());
+        if (lightContext == null) {
+            return null;
+        }
+        return lightContext.getLightState();
+    }
 
+    @SchemaMapping(typeName = "Light")
     public List<LightData> datas(Light light, @Argument @Nullable TimeRange timeRange) {
 
         LambdaQueryWrapper<LightData> listQuery = new LambdaQueryWrapper<>();

@@ -1,9 +1,9 @@
-package com.til.light_iot_cloud.data.input;
+package com.til.light_iot_cloud.data;
 
 import lombok.Data;
 
 @Data
-public class LightStateInput {
+public class LightState {
     Boolean enableWirelessCharging;
     Float wirelessChargingPower;
 }

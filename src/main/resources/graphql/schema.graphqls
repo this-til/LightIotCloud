@@ -137,7 +137,6 @@ type LightState {
     wirelessChargingPower : Float
 }
 
-
 type DetectionKeyframe {
     id : ID!
     lightId : ID!
@@ -169,6 +168,13 @@ type Car {
     updatedAt : DateTime!
 
     online : Boolean
+
+    # 离线时为 null
+    carState : CarState
+}
+
+type CarState {
+    TODO : ID
 }
 
 
@@ -209,7 +215,7 @@ type UserMutation {
 
 type LightMutation {
     reportUpdate(lightDataInput : LightDataInput) : Result
-    reportState(lightStateInput : LightStateInput) : Result
+    reportState(lightState : LightStateInput) : Result
     reportDetection(detectionInput : DetectionInput) : Result
 
     setConfiguration(key : String, value : String) : Result
@@ -253,11 +259,15 @@ input LightDataInput  {
 }
 
 type CarMutation {
+
+    reportState(carState : LightStateInput) : Result
+
+    setConfiguration(key : String, value : String) : Result
+
     operationCar(operationCarInput : OperationCarInput) : Result
 }
 
 input OperationCarInput {
-
     translationAdvance : Boolean
     translationLeft : Boolean
     translationRetreat : Boolean
@@ -276,6 +286,9 @@ type Subscription {
 
     updateConfigurationEvent : UpdateConfigurationEvent
 
+    # light
+
+
     # car
     operationCarEvent : OperationCarEvent
 }
@@ -283,13 +296,17 @@ type Subscription {
 # web
 extend type Subscription {
 
-    testSubscription : String
+    testSubscription : Int
 
     deviceOnlineStateSwitchEvent : DeviceOnlineStateSwitchEvent
 
+    lightStateReportEvent(lightId : Int) : LightState
+    lightDataReportEvent(lightId : Int) : LightData
+
+    carStateReportEvent(carId : Int) : CarState
 }
 
-type UpdateConfigurationEvent{
+type UpdateConfigurationEvent {
     key : String!
     value : String!
 }
@@ -315,8 +332,9 @@ type DeviceOnlineStateSwitchEvent {
 
     # 如果作为车则非空
     car : Car
-}
 
+    deviceName : String
+}
 
 
 
