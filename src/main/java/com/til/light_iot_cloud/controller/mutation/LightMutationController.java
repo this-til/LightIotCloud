@@ -164,7 +164,7 @@ public class LightMutationController {
     }
 
     @SchemaMapping(typeName = "LightMutation")
-    public Result<Void> setSwitch(Light light, @Argument Boolean value) {
+    public Result<Void> setAutomaticGear(Light light, @Argument Boolean value) {
         return setConfiguration(light, "Device.Switch", value.toString());
     }
 

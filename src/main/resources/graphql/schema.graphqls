@@ -224,7 +224,7 @@ type LightMutation {
     setGear(value : Int) : Result
 
     # 设置自动亮度调节
-    setSwitch(value : Boolean) : Result
+    setAutomaticGear(value : Boolean) : Result
 }
 
 # noinspection GraphQLUnresolvedReference,GraphQLMissingType

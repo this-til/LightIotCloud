@@ -36,17 +36,6 @@ public class CarMutationController {
         return Result.successful();
     }
 
-
-    @SchemaMapping(typeName = "Light")
-    public CarState lightState(@ContextValue AuthContext authContext, Car car) {
-        CarContext carContext = deviceRunManager.getCarContext(car.getId());
-        if (carContext == null) {
-            return null;
-
-        }
-        return carContext.getCarState();
-    }
-
     @SchemaMapping(typeName = "CarMutation")
     public Result<Void> setConfiguration(Car car, @Argument String key, @Argument String value) {
         eventPublisher.publishEvent(new UpdateConfigurationEvent(this, DeviceType.LIGHT, car.getId(), key, value));
