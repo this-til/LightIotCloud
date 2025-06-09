@@ -1,12 +1,15 @@
 package com.til.light_iot_cloud.controller.query;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.til.light_iot_cloud.data.*;
 import com.til.light_iot_cloud.service.CarService;
+import com.til.light_iot_cloud.service.DetectionModelService;
 import com.til.light_iot_cloud.service.LightService;
 import jakarta.annotation.Resource;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 
 import java.util.List;
 
@@ -19,6 +22,9 @@ public class UserController {
 
     @Resource
     private LightService lightService;
+
+    @Resource
+    private DetectionModelService detectionModelService;
 
     @SchemaMapping(typeName = "User")
     public List<Light> lights(User user) {
@@ -50,5 +56,11 @@ public class UserController {
         return carService.getCarById(user.getId(), id);
     }
 
-
+    @SchemaMapping(typeName = "User")
+    public List<DetectionModel> model(User user) {
+        return detectionModelService.list(
+                new LambdaQueryWrapper<DetectionModel>()
+                        .eq(DetectionModel::getUserId, user.getId())
+        );
+    }
 }

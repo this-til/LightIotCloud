@@ -24,6 +24,10 @@ spring:
       max-file-size: 10MB
       max-request-size: 20MB
 
+extendGraphQlWebSocketHandler:
+  pingTimeout: 30s
+  checkInterval: 5s
+
 cors:
   allowed-origins: "*"
 

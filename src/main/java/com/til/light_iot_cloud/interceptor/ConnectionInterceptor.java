@@ -139,21 +139,23 @@ public class ConnectionInterceptor implements WebSocketGraphQlInterceptor {
         info.getAttributes().put(LINK_TYPE, LinkType.DEVICE_WEBSOCKET);
         info.getAttributes().put(DEVICE_TYPE, deviceTypeStr);
 
-        switch (deviceType) {
-            case LIGHT -> {
-                Light light = lightService.existLight(user.getId(), deviceName);
-                authContext.setLight(light);
-                info.getAttributes().put(AUTH_CONTEXT, authContext);
+        synchronized (this) {
+            switch (deviceType) {
+                case LIGHT -> {
+                    Light light = lightService.existLight(user.getId(), deviceName);
+                    authContext.setLight(light);
+                    info.getAttributes().put(AUTH_CONTEXT, authContext);
+                }
+                case CAR -> {
+                    Car car = carService.existCar(user.getId(), deviceName);
+                    authContext.setCar(car);
+                    info.getAttributes().put(AUTH_CONTEXT, authContext);
+                }
             }
-            case CAR -> {
-                Car car = carService.existCar(user.getId(), deviceName);
-                authContext.setCar(car);
-                info.getAttributes().put(AUTH_CONTEXT, authContext);
-            }
-        }
 
-        deviceConnectionManager.registerSession(authContext);
-        return Mono.just(payload);
+            deviceConnectionManager.registerSession(authContext);
+            return Mono.just(payload);
+        }
     }
 
     @Override

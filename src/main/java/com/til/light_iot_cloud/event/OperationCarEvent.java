@@ -7,13 +7,12 @@ import org.springframework.context.ApplicationEvent;
 import java.time.Clock;
 
 @Getter
-public class OperationCarEvent extends ApplicationEvent implements ISinksEvent {
+public class OperationCarEvent implements ISinksEvent {
 
     Long carId;
     OperationCarInput operationCarInput;
 
-    public OperationCarEvent(Object source, Long carId, OperationCarInput operationCarInput) {
-        super(source);
+    public OperationCarEvent(Long carId, OperationCarInput operationCarInput) {
         this.operationCarInput = operationCarInput;
         this.carId = carId;
     }

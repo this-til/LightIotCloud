@@ -8,6 +8,8 @@ import com.til.light_iot_cloud.component.DeviceRunManager;
 import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.context.LightContext;
 import com.til.light_iot_cloud.data.*;
+import com.til.light_iot_cloud.data.input.DetectionKeyframesFilter;
+import com.til.light_iot_cloud.data.input.ModelSelect;
 import com.til.light_iot_cloud.data.input.TimeRange;
 import com.til.light_iot_cloud.enums.DeviceType;
 import com.til.light_iot_cloud.enums.LinkType;
@@ -97,6 +99,40 @@ public class LightController {
             );
         }
 
+        listQuery.orderByDesc(DetectionKeyframe::getTime);
+
+        if (page == null) {
+            page = new Page<>();
+        }
+
+        return detectionKeyframeService.page(page, listQuery).getRecords();
+    }
+
+    /*@SchemaMapping(typeName = "Light")
+    public List<DetectionKeyframe> detectionKeyframes(
+            Light light,
+            @Argument @Nullable DetectionKeyframesFilter detectionKeyframesFilter
+    ) {
+
+        LambdaQueryWrapper<DetectionKeyframe> listQuery = new LambdaQueryWrapper<>();
+        listQuery.eq(DetectionKeyframe::getLightId, light.getId());
+
+        Page<DetectionKeyframe> page = null;
+
+        if (detectionKeyframesFilter != null) {
+            page = detectionKeyframesFilter.getPage();
+            if (page != null) {
+                page = new Page<>();
+            }
+
+
+            @Nullable
+            List<ModelSelect> models = detectionKeyframesFilter.getModels();
+            if (models != null) {
+
+            }
+        }
+
         listQuery.orderByAsc(DetectionKeyframe::getTime);
 
         if (page == null) {
@@ -104,11 +140,11 @@ public class LightController {
         }
 
         return detectionKeyframeService.list(page, listQuery);
-    }
+    }*/
 
     @SchemaMapping(typeName = "LightData")
     public Double pm2_5(LightData lightData) {
-        return lightData.getPm2_5();
+        return lightData.getPm25();
     }
 }
 

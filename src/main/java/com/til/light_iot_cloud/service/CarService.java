@@ -48,7 +48,7 @@ public interface CarService extends IService<Car> {
         );
     }
 
-    default Car registerCar(Long userId, String name) {
+    /*default Car registerCar(Long userId, String name) {
         Car car = getCarByName(userId, name);
 
         if (car != null) {
@@ -61,7 +61,7 @@ public interface CarService extends IService<Car> {
         save(car);
 
         return car;
-    }
+    }*/
 
     default Car existCar(Long userId, String name) {
         Car car = getCarByName(userId, name);
@@ -70,7 +70,21 @@ public interface CarService extends IService<Car> {
             return car;
         }
 
-        return registerCar(userId, name);
+        synchronized (this) {
+            car = getCarByName(userId, name);
+            if (car != null) {
+                return car;
+            }
+
+            car = new Car();
+            car.setUserId(userId);
+            car.setName(name);
+
+            save(car);
+
+            return car;
+        }
+
     }
 
 

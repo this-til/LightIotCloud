@@ -19,43 +19,26 @@ import java.util.stream.Collectors;
 public interface DetectionItemService extends IService<DetectionItem> {
 
     @Transactional
-    default Map<String, DetectionItem> ensureExistence(Set<String> set, Long modelId) {
+    default Map<String, DetectionItem> ensureExistence(List<String> set, Long modelId) {
         Map<String, DetectionItem> collect = list(
                 new LambdaQueryWrapper<DetectionItem>()
                         .eq(DetectionItem::getModelId, modelId)
+                        .in(DetectionItem::getName, set)
         )
                 .stream()
                 .collect(Collectors.toMap(DetectionItem::getName, m -> m));
 
 
-        Set<String> existence = set.stream()
+        List<String> existence = set.stream()
                 .filter(s -> !collect.containsKey(s))
-                .collect(Collectors.toSet());
+                .toList();
 
-        if (!existence.isEmpty()) {
-            saveBatch(
-                    existence
-                            .stream()
-                            .map(
-                                    s -> {
-                                        DetectionItem detectionItem = new DetectionItem();
-                                        detectionItem.setName(s);
-                                        detectionItem.setModelId(modelId);
-                                        return detectionItem;
-                                    }
-                            )
-                            .collect(Collectors.toList())
-            );
-        }
-
-        List<DetectionItem> list = list(
-                new LambdaQueryWrapper<DetectionItem>()
-                        .eq(DetectionItem::getModelId, modelId)
-                        .in(DetectionItem::getName, existence)
-        );
-
-        for(DetectionItem detectionModel : list) {
-            collect.put(detectionModel.getName(), detectionModel);
+        for(String s : existence) {
+            DetectionItem detectionItem = new DetectionItem();
+            detectionItem.setName(s);
+            detectionItem.setModelId(modelId);
+            save(detectionItem);
+            collect.put(s, detectionItem);
         }
 
         return collect;

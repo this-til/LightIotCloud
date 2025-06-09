@@ -1,5 +1,6 @@
 package com.til.light_iot_cloud.config;
 
+import com.til.light_iot_cloud.handler.ExtendGraphQlWebSocketHandler;
 import graphql.GraphQLContext;
 import graphql.execution.CoercedVariables;
 import graphql.language.StringValue;
@@ -8,15 +9,22 @@ import graphql.scalars.ExtendedScalars;
 import graphql.schema.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
+import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.graphql.execution.RuntimeWiringConfigurer;
+import org.springframework.graphql.server.WebGraphQlHandler;
+import org.springframework.graphql.server.webmvc.GraphQlWebSocketHandler;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.GenericHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
 
-import java.util.Base64;
-import java.util.Locale;
+import java.util.*;
 
 @Configuration
 public class GraphQLConfig {
+
     public static final GraphQLScalarType BYTE_ARRAY = GraphQLScalarType.newScalar()
             .name("Bytes") // 标量类型名称
             .description("Base64 encoded byte array") // 描述
@@ -63,5 +71,29 @@ public class GraphQLConfig {
         };
     }
 
+    @Bean
+    public GraphQlWebSocketHandler graphQlWebSocketHandler(WebGraphQlHandler webGraphQlHandler,
+                                                           GraphQlProperties properties, HttpMessageConverters converters) {
+        return new ExtendGraphQlWebSocketHandler(this, webGraphQlHandler, converters, properties);
+    }
+
+    public GenericHttpMessageConverter<Object> getJsonConverter(HttpMessageConverters converters) {
+        return converters.getConverters()
+                .stream()
+                .filter(this::canReadJsonMap)
+                .findFirst()
+                .map(this::asGenericHttpMessageConverter)
+                .orElseThrow(() -> new IllegalStateException("No JSON converter"));
+    }
+
+
+    private boolean canReadJsonMap(HttpMessageConverter<?> candidate) {
+        return candidate.canRead(Map.class, MediaType.APPLICATION_JSON);
+    }
+
+    @SuppressWarnings("unchecked")
+    private GenericHttpMessageConverter<Object> asGenericHttpMessageConverter(HttpMessageConverter<?> converter) {
+        return (GenericHttpMessageConverter<Object>) converter;
+    }
 
 }

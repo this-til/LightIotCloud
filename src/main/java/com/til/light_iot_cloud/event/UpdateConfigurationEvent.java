@@ -7,7 +7,7 @@ import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 @Getter
-public class UpdateConfigurationEvent extends ApplicationEvent implements ISinksEvent {
+public class UpdateConfigurationEvent implements ISinksEvent {
 
     DeviceType deviceType;
     Long deviceId;
@@ -15,8 +15,7 @@ public class UpdateConfigurationEvent extends ApplicationEvent implements ISinks
     String key;
     String value;
 
-    public UpdateConfigurationEvent(Object source, DeviceType deviceType, Long deviceId, String key, String value) {
-        super(source);
+    public UpdateConfigurationEvent(DeviceType deviceType, Long deviceId, String key, String value) {
         this.deviceType = deviceType;
         this.deviceId = deviceId;
         this.key = key;

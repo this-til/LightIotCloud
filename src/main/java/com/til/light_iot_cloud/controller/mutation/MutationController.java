@@ -68,7 +68,7 @@ public class MutationController {
 
         Light light = authContext.getLight();
         light.setUpdatedAt(OffsetDateTime.now());
-        lightService.save(light);
+        lightService.updateById(light);
         return light;
     }
 
@@ -79,7 +79,7 @@ public class MutationController {
         }
         Car car = authContext.getCar();
         car.setUpdatedAt(OffsetDateTime.now());
-        carService.save(car);
+        carService.updateById(car);
         return car;
     }
 }

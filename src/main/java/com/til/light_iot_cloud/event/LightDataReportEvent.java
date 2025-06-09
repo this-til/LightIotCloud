@@ -6,12 +6,11 @@ import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 @Getter
-public class LightDataReportEvent extends ApplicationEvent implements ISinksEvent {
+public class LightDataReportEvent implements ISinksEvent {
     Long lightId;
     LightData lightData;
 
-    public LightDataReportEvent(Object source, Long lightId, LightData lightData) {
-        super(source);
+    public LightDataReportEvent(Long lightId, LightData lightData) {
         this.lightId = lightId;
         this.lightData = lightData;
     }

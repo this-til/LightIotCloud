@@ -1,7 +1,7 @@
 package com.til.light_iot_cloud.controller.subscription;
 
 import com.til.light_iot_cloud.component.DeviceConnectionManager;
-import com.til.light_iot_cloud.component.EventSinkHolder;
+import com.til.light_iot_cloud.component.SinkEventHolder;
 import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.data.input.OperationCarInput;
 import com.til.light_iot_cloud.enums.DeviceType;
@@ -20,7 +20,7 @@ public class SubscriptionController {
     private DeviceConnectionManager deviceConnectionManager;
 
     @Resource
-    private EventSinkHolder eventSinkHolder;
+    private SinkEventHolder sinkEventHolder;
 
     @SubscriptionMapping
     public Flux<UpdateConfigurationEvent> updateConfigurationEvent(@ContextValue AuthContext authContext) {
@@ -33,7 +33,7 @@ public class SubscriptionController {
 
         DeviceType deviceType = authContext.getDeviceType();
         Long deviceId = authContext.getDeviceId();
-        return eventSinkHolder
+        return sinkEventHolder
                 .getSinks(UpdateConfigurationEvent.class)
                 .asFlux()
                 .filter(e -> e.getDeviceType().equals(deviceType))
@@ -54,7 +54,7 @@ public class SubscriptionController {
         }
 
         Long id = authContext.getCar().getId();
-        return eventSinkHolder
+        return sinkEventHolder
                 .getSinks(OperationCarEvent.class)
                 .asFlux()
                 .filter(e -> e.getCarId().equals(id))

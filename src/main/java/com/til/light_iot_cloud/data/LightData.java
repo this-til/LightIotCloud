@@ -1,6 +1,7 @@
 package com.til.light_iot_cloud.data;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -50,7 +51,8 @@ public class LightData {
     /**
      * PM2.5
      */
-    private Double pm2_5;
+    @TableField("pm2_5")
+    private Double pm25;
 
     /**
      * 光照

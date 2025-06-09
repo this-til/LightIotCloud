@@ -1,6 +1,6 @@
 package com.til.light_iot_cloud.controller.subscription;
 
-import com.til.light_iot_cloud.component.EventSinkHolder;
+import com.til.light_iot_cloud.component.SinkEventHolder;
 import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.data.*;
 import com.til.light_iot_cloud.enums.LinkType;
@@ -23,7 +23,7 @@ import java.time.Duration;
 public class WebSubscriptionController {
 
     @Resource
-    private EventSinkHolder eventSinkHolder;
+    private SinkEventHolder sinkEventHolder;
 
     @Resource
     private CarService carService;
@@ -41,7 +41,7 @@ public class WebSubscriptionController {
         if (authContext.getLinkType() != LinkType.WEBSOCKET) {
             throw new IllegalArgumentException("Only websocket links are supported");
         }
-        return eventSinkHolder.getSinks(DeviceOnlineStateSwitchEvent.class).asFlux();
+        return sinkEventHolder.getSinks(DeviceOnlineStateSwitchEvent.class).asFlux();
     }
 
     @SubscriptionMapping
@@ -55,7 +55,7 @@ public class WebSubscriptionController {
             throw new IllegalArgumentException("No such light");
         }
 
-        return eventSinkHolder.getSinks(LightStateReportEvent.class)
+        return sinkEventHolder.getSinks(LightStateReportEvent.class)
                 .asFlux()
                 .filter(e -> e.getLightId().equals(lightId))
                 .map(LightStateReportEvent::getLightState);
@@ -73,7 +73,7 @@ public class WebSubscriptionController {
             throw new IllegalArgumentException("No such light");
         }
 
-        return eventSinkHolder.getSinks(LightDataReportEvent.class)
+        return sinkEventHolder.getSinks(LightDataReportEvent.class)
                 .asFlux()
                 .filter(e -> e.getLightId().equals(lightId))
                 .map(LightDataReportEvent::getLightData);
@@ -90,7 +90,7 @@ public class WebSubscriptionController {
         if (car == null) {
             throw new IllegalArgumentException("No such car");
         }
-        return eventSinkHolder.getSinks(CarStateReportEvent.class)
+        return sinkEventHolder.getSinks(CarStateReportEvent.class)
                 .asFlux()
                 .filter(e -> e.getCarId().equals(car.getId()))
                 .map(CarStateReportEvent::getCarState);

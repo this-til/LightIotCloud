@@ -20,14 +20,14 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 @Slf4j
 @Service
 public class ImageStorageServiceImpl implements ImageStorageService {
 
-
-    public static final String thumb = "thumb_";
+    public static final String thumb = "thumb";
 
     @Value("${image.storage-path}")
     private String storagePath;
@@ -47,42 +47,46 @@ public class ImageStorageServiceImpl implements ImageStorageService {
                 Files.createDirectories(path);
                 log.info("Created image storage directory: {}", path.toAbsolutePath());
             }
+            Path thumbPath = Paths.get(storagePath).resolve(thumb);
+            if (!Files.exists(thumbPath)) {
+                Files.createDirectories(thumbPath);
+                log.info("Created image storage directory: {}", thumbPath.toAbsolutePath());
+            }
         } catch (IOException e) {
             log.error("Could not initialize storage directory", e);
         }
     }
 
     @Override
+    @Transactional
     @SneakyThrows
-    public String storeImage(MultipartFile file) {
+    public void storeImage(MultipartFile file, String name) {
 
         if (file.isEmpty()) {
             throw new IllegalArgumentException("Cannot store empty file");
         }
 
-        return storeImage(file.getBytes());
+        storeImage(file.getBytes(), name);
     }
 
+    @Transactional
     @SneakyThrows
     @Override
-    public String storeImage(byte[] bytes) {
-        String filename = UUID.randomUUID() + ".jpg";
-        String thumbnailFilename = "thumb_" + filename;
+    public void storeImage(byte[] bytes, String name) {
+        String filename = name + ".jpg";
+        String thumbnailFilename = thumb + "/" + filename;
 
         // 存储原始图像
         Path destination = Paths.get(storagePath).resolve(filename);
-        Files.copy(new ByteArrayInputStream(bytes), destination);
+        Files.copy(new ByteArrayInputStream(bytes), destination, StandardCopyOption.REPLACE_EXISTING);
 
         createScaledThumbnail(bytes, thumbnailFilename);
 
         log.info("Stored image: {}", destination.toAbsolutePath());
-        return filename;
     }
 
     private void createScaledThumbnail(byte[] imageData, String thumbnailFilename) throws IOException {
         Path thumbnailPath = Paths.get(storagePath).resolve(thumbnailFilename);
-
-
         try (InputStream inputStream = new ByteArrayInputStream(imageData)) {
             Thumbnails.of(inputStream)
                     .scale(thumbnailWidth, thumbnailHeight)
@@ -102,6 +106,17 @@ public class ImageStorageServiceImpl implements ImageStorageService {
         throw new RuntimeException("Could not read file: " + filename);
     }
 
+    @SneakyThrows
+    public Resource loadThumbImage(String filename) {
+        Path file = Paths.get(storagePath).resolve(thumb).resolve(filename);
+        Resource resource = new UrlResource(file.toUri());
+        if (resource.exists() || resource.isReadable()) {
+            return resource;
+        }
+        throw new RuntimeException("Could not read file: " + filename);
+    }
+
+    @Transactional
     @SneakyThrows
     public void deleteImage(String filename) {
         Path file = Paths.get(storagePath).resolve(filename);

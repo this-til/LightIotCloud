@@ -2,6 +2,7 @@ package com.til.light_iot_cloud.controller.mutation;
 
 import com.til.light_iot_cloud.component.DeviceConnectionManager;
 import com.til.light_iot_cloud.component.DeviceRunManager;
+import com.til.light_iot_cloud.component.SinkEventHolder;
 import com.til.light_iot_cloud.context.LightContext;
 import com.til.light_iot_cloud.data.*;
 import com.til.light_iot_cloud.data.input.DetectionInput;
@@ -52,7 +53,7 @@ public class LightMutationController {
     private ImageStorageService imageStorageService;
 
     @Resource
-    private ApplicationEventPublisher applicationEventPublisher;
+    private SinkEventHolder sinkEventHolder;
 
     @SchemaMapping(typeName = "LightMutation")
     public Result<Void> reportUpdate(Light light, @Argument LightData lightDataInput) {
@@ -63,7 +64,7 @@ public class LightMutationController {
         }
 
         lightDataInput.setLightId(light.getId());
-        applicationEventPublisher.publishEvent(new LightDataReportEvent(this, light.getId(), lightDataInput));
+        sinkEventHolder.publishEvent(new LightDataReportEvent(light.getId(), lightDataInput));
         return Result.ofBool(lightDataService.save(lightDataInput));
     }
 
@@ -77,7 +78,7 @@ public class LightMutationController {
 
         lightContext.setLightState(lightState);
 
-        applicationEventPublisher.publishEvent(new LightStateReportEvent(this, light.getId(), lightState));
+        sinkEventHolder.publishEvent(new LightStateReportEvent(light.getId(), lightState));
 
         return Result.successful();
     }
@@ -88,11 +89,11 @@ public class LightMutationController {
 
         DetectionKeyframe detectionKeyframe = new DetectionKeyframe();
 
-        String url = imageStorageService.storeImage(detectionInput.getImage());
-
+        detectionKeyframe.setUserId(light.getUserId());
         detectionKeyframe.setLightId(light.getId());
-        detectionKeyframe.setUrl(url);
         detectionKeyframeService.save(detectionKeyframe);
+
+        imageStorageService.storeImage(detectionInput.getImage(), detectionKeyframe.getId().toString());
 
         if (detectionInput.getItems().isEmpty()) {
             return Result.successful();
@@ -103,7 +104,7 @@ public class LightMutationController {
         Map<String, List<DetectionItemInput>> modelMap = items.stream()
                 .collect(Collectors.groupingBy(DetectionItemInput::getModel));
 
-        Map<String, DetectionModel> stringDetectionModelMap = detectionModelService.ensureExistence(modelMap.keySet(), light.getUserId());
+        Map<String, DetectionModel> stringDetectionModelMap = detectionModelService.ensureExistence(modelMap.keySet().stream().toList(), light.getUserId());
 
         List<Detection> detectionList = new ArrayList<>();
 
@@ -120,7 +121,7 @@ public class LightMutationController {
             Map<String, List<DetectionItemInput>> itemMap = value.stream()
                     .collect(Collectors.groupingBy(DetectionItemInput::getItem));
 
-            Map<String, DetectionItem> stringDetectionItemMap = detectionItemService.ensureExistence(itemMap.keySet(), detectionModel.getId());
+            Map<String, DetectionItem> stringDetectionItemMap = detectionItemService.ensureExistence(itemMap.keySet().stream().toList(), detectionModel.getId());
 
             for(Map.Entry<String, List<DetectionItemInput>> itemEntry : itemMap.entrySet()) {
 
@@ -154,7 +155,7 @@ public class LightMutationController {
 
     @SchemaMapping(typeName = "LightMutation")
     public Result<Void> setConfiguration(Light light, @Argument String key, @Argument String value) {
-        applicationEventPublisher.publishEvent(new UpdateConfigurationEvent(this, DeviceType.LIGHT, light.getId(), key, value));
+        sinkEventHolder.publishEvent(new UpdateConfigurationEvent(DeviceType.LIGHT, light.getId(), key, value));
         return Result.successful();
     }
 

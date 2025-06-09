@@ -1,6 +1,9 @@
 package com.til.light_iot_cloud.config;
 
 
+import com.til.light_iot_cloud.interceptor.LoginInterceptor;
+import jakarta.annotation.Resource;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
@@ -18,6 +22,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("#{'${cors.allowed-origins}'.split(',')}")
     private List<String> allowedOrigins;
 
+    @Resource
+    private LoginInterceptor loginInterceptor;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -40,5 +46,9 @@ public class WebConfig implements WebMvcConfigurer {
                 .build();
     }
 
+    @Override
+    public void addInterceptors(@NotNull InterceptorRegistry registry) {
+        registry.addInterceptor(loginInterceptor).excludePathPatterns("/graphql");
+    }
 
 }

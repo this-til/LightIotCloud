@@ -6,6 +6,7 @@ import com.til.light_iot_cloud.data.Light;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.til.light_iot_cloud.data.User;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -49,25 +50,6 @@ public interface LightService extends IService<Light> {
         );
     }
 
-
-    default Light registerLight(Long userId, String name) {
-        Light light = getLightByName(userId, name);
-
-        if (light != null) {
-            throw new SecurityException("Light already exists");
-        }
-
-        light = new Light();
-        light.setName(name);
-        light.setUserId(userId);
-
-        if (!save(light)) {
-            throw new SecurityException("save failed");
-        }
-
-        return light;
-    }
-
     default Light existLight(Long userId, String name) {
         Light light = getLightByName(userId, name);
 
@@ -75,7 +57,23 @@ public interface LightService extends IService<Light> {
             return light;
         }
 
-        return registerLight(userId, name);
+        synchronized (this) {
+
+            light = getLightByName(userId, name);
+
+            if (light != null) {
+                return light;
+            }
+
+            light = new Light();
+            light.setUserId(userId);
+            light.setName(name);
+
+            save(light);
+
+            return light;
+
+        }
     }
 
 }

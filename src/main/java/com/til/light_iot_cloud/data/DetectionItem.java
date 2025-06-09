@@ -16,7 +16,7 @@ public class DetectionItem {
     /**
      * 
      */
-    @TableId
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**

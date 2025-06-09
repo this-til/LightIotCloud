@@ -1,6 +1,7 @@
 package com.til.light_iot_cloud.controller.mutation;
 
 import com.til.light_iot_cloud.component.DeviceRunManager;
+import com.til.light_iot_cloud.component.SinkEventHolder;
 import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.context.CarContext;
 import com.til.light_iot_cloud.context.LightContext;
@@ -25,27 +26,27 @@ public class CarMutationController {
     private CarService carService;
 
     @Resource
-    private ApplicationEventPublisher eventPublisher;
+    private DeviceRunManager deviceRunManager;
 
     @Resource
-    private DeviceRunManager deviceRunManager;
+    private SinkEventHolder sinkEventHolder;
 
     @SchemaMapping(typeName = "CarMutation")
     public Result<Void> reportState(Car car, @Argument CarState carState) {
-        eventPublisher.publishEvent(new CarStateReportEvent(this, car.getId(), carState));
+        sinkEventHolder.publishEvent(new CarStateReportEvent( car.getId(), carState));
         return Result.successful();
     }
 
     @SchemaMapping(typeName = "CarMutation")
     public Result<Void> setConfiguration(Car car, @Argument String key, @Argument String value) {
-        eventPublisher.publishEvent(new UpdateConfigurationEvent(this, DeviceType.LIGHT, car.getId(), key, value));
+        sinkEventHolder.publishEvent(new UpdateConfigurationEvent( DeviceType.LIGHT, car.getId(), key, value));
         return Result.successful();
     }
 
     @SchemaMapping(typeName = "CarMutation")
     public Result<Void> operationCar(Car car, @Argument OperationCarInput operationCarInput) {
-        OperationCarEvent operationCarEvent = new OperationCarEvent(this, car.getId(), operationCarInput);
-        eventPublisher.publishEvent(operationCarEvent);
+        OperationCarEvent operationCarEvent = new OperationCarEvent( car.getId(), operationCarInput);
+        sinkEventHolder.publishEvent(operationCarEvent);
         return Result.successful();
     }
 

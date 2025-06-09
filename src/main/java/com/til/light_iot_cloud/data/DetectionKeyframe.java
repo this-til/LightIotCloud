@@ -25,12 +25,12 @@ public class DetectionKeyframe {
     /**
      * 
      */
-    private Long lightId;
+    private Long userId;
 
     /**
      * 
      */
-    private String url;
+    private Long lightId;
 
     /**
      * 
@@ -50,8 +50,8 @@ public class DetectionKeyframe {
         }
         DetectionKeyframe other = (DetectionKeyframe) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
+            && (this.getUserId() == null ? other.getUserId() == null : this.getUserId().equals(other.getUserId()))
             && (this.getLightId() == null ? other.getLightId() == null : this.getLightId().equals(other.getLightId()))
-            && (this.getUrl() == null ? other.getUrl() == null : this.getUrl().equals(other.getUrl()))
             && (this.getTime() == null ? other.getTime() == null : this.getTime().equals(other.getTime()));
     }
 
@@ -60,8 +60,8 @@ public class DetectionKeyframe {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+        result = prime * result + ((getUserId() == null) ? 0 : getUserId().hashCode());
         result = prime * result + ((getLightId() == null) ? 0 : getLightId().hashCode());
-        result = prime * result + ((getUrl() == null) ? 0 : getUrl().hashCode());
         result = prime * result + ((getTime() == null) ? 0 : getTime().hashCode());
         return result;
     }
@@ -73,8 +73,8 @@ public class DetectionKeyframe {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
+        sb.append(", userId=").append(userId);
         sb.append(", lightId=").append(lightId);
-        sb.append(", url=").append(url);
         sb.append(", time=").append(time);
         sb.append("]");
         return sb.toString();
