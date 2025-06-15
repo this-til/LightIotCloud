@@ -2,11 +2,9 @@ package com.til.light_iot_cloud.controller.mutation;
 
 import com.til.light_iot_cloud.config.JwtTokenConfig;
 import com.til.light_iot_cloud.context.AuthContext;
-import com.til.light_iot_cloud.data.Car;
-import com.til.light_iot_cloud.data.Light;
+import com.til.light_iot_cloud.data.Device;
 import com.til.light_iot_cloud.data.User;
-import com.til.light_iot_cloud.service.CarService;
-import com.til.light_iot_cloud.service.LightService;
+import com.til.light_iot_cloud.service.DeviceService;
 import com.til.light_iot_cloud.service.UserService;
 import jakarta.annotation.Resource;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -23,10 +21,7 @@ public class MutationController {
     private UserService userService;
 
     @Resource
-    public LightService lightService;
-
-    @Resource
-    public CarService carService;
+    private DeviceService deviceService;
 
     @Resource
     private JwtTokenConfig jwtTokenConfig;
@@ -61,25 +56,15 @@ public class MutationController {
     }
 
     @MutationMapping
-    public Light lightSelf(@ContextValue AuthContext authContext) {
-        if (authContext.getLight() == null) {
+    public Device deviceSelf(@ContextValue AuthContext authContext) {
+        if (authContext.getUser() == null) {
             throw new SecurityException("You are not logged in");
         }
-
-        Light light = authContext.getLight();
-        light.setUpdatedAt(OffsetDateTime.now());
-        lightService.updateById(light);
-        return light;
-    }
-
-    @MutationMapping
-    public Car carSelf(@ContextValue AuthContext authContext) {
-        if (authContext.getCar() == null) {
-            throw new SecurityException("You are not logged in");
+        if (authContext.getDevice() == null) {
+            throw new SecurityException("The logged is not device");
         }
-        Car car = authContext.getCar();
-        car.setUpdatedAt(OffsetDateTime.now());
-        carService.updateById(car);
-        return car;
+        return authContext.getDevice();
     }
+
+
 }

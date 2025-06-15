@@ -18,6 +18,10 @@ public class DetectionKeyframeController {
 
     @SchemaMapping(typeName = "DetectionKeyframe")
     public List<Detection> detections(DetectionKeyframe detectionKeyframe) {
+        if (detectionKeyframe.getDetections() != null) {
+            return detectionKeyframe.getDetections();
+        }
+
         LambdaQueryWrapper<Detection> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Detection::getKeyframeId, detectionKeyframe.getId());
 

@@ -3,24 +3,24 @@ package com.til.light_iot_cloud.controller.mutation;
 import com.til.light_iot_cloud.component.DeviceConnectionManager;
 import com.til.light_iot_cloud.component.DeviceRunManager;
 import com.til.light_iot_cloud.component.SinkEventHolder;
-import com.til.light_iot_cloud.context.LightContext;
+import com.til.light_iot_cloud.context.DeviceContext;
 import com.til.light_iot_cloud.data.*;
 import com.til.light_iot_cloud.data.input.DetectionInput;
 import com.til.light_iot_cloud.data.input.DetectionItemInput;
 import com.til.light_iot_cloud.data.LightState;
 import com.til.light_iot_cloud.enums.DeviceType;
 import com.til.light_iot_cloud.event.LightDataReportEvent;
+import com.til.light_iot_cloud.event.LightDetectionReportEvent;
 import com.til.light_iot_cloud.event.LightStateReportEvent;
 import com.til.light_iot_cloud.event.UpdateConfigurationEvent;
 import com.til.light_iot_cloud.service.*;
 import jakarta.annotation.Resource;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.ContextValue;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,25 +55,39 @@ public class LightMutationController {
     @Resource
     private SinkEventHolder sinkEventHolder;
 
-    @SchemaMapping(typeName = "LightMutation")
-    public Result<Void> reportUpdate(Light light, @Argument LightData lightDataInput) {
-        LightContext lightContext = deviceRunManager.getLightContext(light.getId());
+    @Resource
+    private DeviceMutationController deviceMutationController;
 
-        if (lightContext == null) {
-            return Result.error("light not online");
+    @SchemaMapping(typeName = "LightMutation")
+    public Result<Void> reportUpdate(Device light, @Argument LightData lightDataInput) {
+        DeviceContext deviceContext = deviceRunManager.getDeviceContext(light.getId());
+
+        if (deviceContext == null) {
+            throw new IllegalArgumentException("No device context found for light: " + light.getId());
+        }
+
+        if (!(deviceContext instanceof DeviceContext.LightContext lightContext)) {
+            throw new IllegalArgumentException("device context is not a LightContext");
         }
 
         lightDataInput.setLightId(light.getId());
         sinkEventHolder.publishEvent(new LightDataReportEvent(light.getId(), lightDataInput));
+
+        lightDataInput.setPm25(lightDataInput.getPm2_5());
+
         return Result.ofBool(lightDataService.save(lightDataInput));
     }
 
     @SchemaMapping(typeName = "LightMutation")
-    public Result<Void> reportState(Light light, @Argument LightState lightState) {
-        LightContext lightContext = deviceRunManager.getLightContext(light.getId());
+    public Result<Void> reportState(Device light, @Argument LightState lightState) {
+        DeviceContext deviceContext = deviceRunManager.getDeviceContext(light.getId());
 
-        if (lightContext == null) {
-            return Result.error("light not online");
+        if (deviceContext == null) {
+            throw new IllegalArgumentException("No device context found for light: " + light.getId());
+        }
+
+        if (!(deviceContext instanceof DeviceContext.LightContext lightContext)) {
+            throw new IllegalArgumentException("device context is not a LightContext");
         }
 
         lightContext.setLightState(lightState);
@@ -85,12 +99,22 @@ public class LightMutationController {
 
     @SchemaMapping(typeName = "LightMutation")
     @Transactional
-    public Result<Void> reportDetection(Light light, @Argument DetectionInput detectionInput) {
+    public Result<Void> reportDetection(Device light, @Argument DetectionInput detectionInput) {
+
+        DeviceContext deviceContext = deviceRunManager.getDeviceContext(light.getId());
+
+        if (deviceContext == null) {
+            throw new IllegalArgumentException("No device context found for light: " + light.getId());
+        }
+
+        if (!(deviceContext instanceof DeviceContext.LightContext lightContext)) {
+            throw new IllegalArgumentException("device context is not a LightContext");
+        }
 
         DetectionKeyframe detectionKeyframe = new DetectionKeyframe();
 
         detectionKeyframe.setUserId(light.getUserId());
-        detectionKeyframe.setLightId(light.getId());
+        detectionKeyframe.setDeviceId(light.getId());
         detectionKeyframeService.save(detectionKeyframe);
 
         imageStorageService.storeImage(detectionInput.getImage(), detectionKeyframe.getId().toString());
@@ -149,24 +173,22 @@ public class LightMutationController {
         }
 
         detectionService.saveBatch(detectionList);
+        detectionKeyframe.setDetections(detectionList);
+        detectionKeyframe.setTime(OffsetDateTime.now());
+
+        sinkEventHolder.publishEvent(new LightDetectionReportEvent(light.getId(), detectionKeyframe));
 
         return Result.ofBool(true);
     }
 
     @SchemaMapping(typeName = "LightMutation")
-    public Result<Void> setConfiguration(Light light, @Argument String key, @Argument String value) {
-        sinkEventHolder.publishEvent(new UpdateConfigurationEvent(DeviceType.LIGHT, light.getId(), key, value));
-        return Result.successful();
+    public Result<Void> setGear(Device light, @Argument Integer value) {
+        return deviceMutationController.setConfiguration(light, "Device.Gear", value.toString());
     }
 
     @SchemaMapping(typeName = "LightMutation")
-    public Result<Void> setGear(Light light, @Argument Integer value) {
-        return setConfiguration(light, "Device.Gear", value.toString());
-    }
-
-    @SchemaMapping(typeName = "LightMutation")
-    public Result<Void> setAutomaticGear(Light light, @Argument Boolean value) {
-        return setConfiguration(light, "Device.Switch", value.toString());
+    public Result<Void> setAutomaticGear(Device light, @Argument Boolean value) {
+        return deviceMutationController.setConfiguration(light, "Device.Switch", value.toString());
     }
 
 

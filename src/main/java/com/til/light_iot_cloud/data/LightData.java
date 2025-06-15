@@ -8,28 +8,30 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Date;
+
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 
 /**
- * 
  * @TableName light_data
  */
-@TableName(value ="light_data")
+@TableName(value = "light_data")
 @Data
 public class LightData {
     /**
-     * 
+     *
      */
     @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 
+     *
      */
     private Long lightId;
 
     /**
-     * 
+     *
      */
     private OffsetDateTime time;
 
@@ -51,8 +53,11 @@ public class LightData {
     /**
      * PM2.5
      */
-    @TableField("pm2_5")
+    @TableField(value = "pm2_5")
     private Double pm25;
+
+    @TableField(exist = false)
+    private Double pm2_5;
 
     /**
      * 光照

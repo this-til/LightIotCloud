@@ -4,16 +4,12 @@ import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.data.*;
 import com.til.light_iot_cloud.enums.DeviceType;
 import com.til.light_iot_cloud.enums.LinkType;
-import com.til.light_iot_cloud.service.CarService;
-import com.til.light_iot_cloud.service.LightService;
 import com.til.light_iot_cloud.service.UserService;
 import jakarta.annotation.Resource;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.ContextValue;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
-
-import java.time.OffsetDateTime;
 
 @Controller
 public class QueryController {
@@ -37,25 +33,11 @@ public class QueryController {
     }
 
     @QueryMapping
-    public Light lightSelf(@ContextValue AuthContext authContext) {
+    public Device deviceSelf(@ContextValue AuthContext authContext) {
         if (authContext.getLinkType() != LinkType.DEVICE_WEBSOCKET) {
             throw new IllegalArgumentException("linkType is not DEVICE_WEBSOCKET");
         }
-        if (authContext.getDeviceType() != DeviceType.LIGHT) {
-            throw new IllegalArgumentException("deviceType is not LIGHT");
-        }
-        return authContext.getLight();
-    }
-
-    @QueryMapping
-    public Car carSelf(@ContextValue AuthContext authContext) {
-        if (authContext.getLinkType() != LinkType.DEVICE_WEBSOCKET) {
-            throw new IllegalArgumentException("linkType is not DEVICE_WEBSOCKET");
-        }
-        if (authContext.getDeviceType() != DeviceType.CAR) {
-            throw new IllegalArgumentException("deviceType is not CAR");
-        }
-        return authContext.getCar();
+        return authContext.getDevice();
     }
 
 }

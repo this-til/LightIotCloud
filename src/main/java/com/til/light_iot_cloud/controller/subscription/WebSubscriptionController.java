@@ -3,13 +3,10 @@ package com.til.light_iot_cloud.controller.subscription;
 import com.til.light_iot_cloud.component.SinkEventHolder;
 import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.data.*;
+import com.til.light_iot_cloud.enums.DeviceType;
 import com.til.light_iot_cloud.enums.LinkType;
-import com.til.light_iot_cloud.event.CarStateReportEvent;
-import com.til.light_iot_cloud.event.DeviceOnlineStateSwitchEvent;
-import com.til.light_iot_cloud.event.LightDataReportEvent;
-import com.til.light_iot_cloud.event.LightStateReportEvent;
-import com.til.light_iot_cloud.service.CarService;
-import com.til.light_iot_cloud.service.LightService;
+import com.til.light_iot_cloud.event.*;
+import com.til.light_iot_cloud.service.DeviceService;
 import jakarta.annotation.Resource;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.ContextValue;
@@ -26,10 +23,8 @@ public class WebSubscriptionController {
     private SinkEventHolder sinkEventHolder;
 
     @Resource
-    private CarService carService;
+    private DeviceService deviceService;
 
-    @Resource
-    private LightService lightService;
 
     @SubscriptionMapping
     public Flux<Long> testSubscription() {
@@ -50,8 +45,9 @@ public class WebSubscriptionController {
             throw new IllegalArgumentException("Only websocket links are supported");
         }
 
-        Light light = lightService.getLightById(authContext.getUser().getId(), lightId);
-        if (light == null) {
+        Device device = deviceService.getDeviceById(authContext.getUser().getId(), lightId, DeviceType.LIGHT);
+
+        if (device == null) {
             throw new IllegalArgumentException("No such light");
         }
 
@@ -68,10 +64,12 @@ public class WebSubscriptionController {
             throw new IllegalArgumentException("Only websocket links are supported");
         }
 
-        Light light = lightService.getLightById(authContext.getUser().getId(), lightId);
-        if (light == null) {
+        Device device = deviceService.getDeviceById(authContext.getUser().getId(), lightId, DeviceType.LIGHT);
+
+        if (device == null) {
             throw new IllegalArgumentException("No such light");
         }
+
 
         return sinkEventHolder.getSinks(LightDataReportEvent.class)
                 .asFlux()
@@ -81,18 +79,41 @@ public class WebSubscriptionController {
     }
 
     @SubscriptionMapping
+    public Flux<DetectionKeyframe> lightDetectionReportEvent(@ContextValue AuthContext authContext, @Argument Long lightId) {
+
+        if (authContext.getLinkType() != LinkType.WEBSOCKET) {
+            throw new IllegalArgumentException("Only websocket links are supported");
+        }
+
+        Device device = deviceService.getDeviceById(authContext.getUser().getId(), lightId, DeviceType.LIGHT);
+
+        if (device == null) {
+            throw new IllegalArgumentException("No such light");
+        }
+
+
+        return sinkEventHolder.getSinks(LightDetectionReportEvent.class)
+                .asFlux()
+                .filter(e -> e.getLightId().equals(lightId))
+                .map(LightDetectionReportEvent::getDetectionKeyframe);
+
+    }
+
+    @SubscriptionMapping
     public Flux<CarState> carStateReportEvent(@ContextValue AuthContext authContext, @Argument Long carId) {
         if (authContext.getLinkType() != LinkType.WEBSOCKET) {
             throw new IllegalArgumentException("Only websocket links are supported");
         }
 
-        Car car = carService.getCarById(carId);
-        if (car == null) {
-            throw new IllegalArgumentException("No such car");
+        Device device = deviceService.getDeviceById(authContext.getUser().getId(), carId, DeviceType.CAR);
+
+        if (device == null) {
+            throw new IllegalArgumentException("No such light");
         }
+
         return sinkEventHolder.getSinks(CarStateReportEvent.class)
                 .asFlux()
-                .filter(e -> e.getCarId().equals(car.getId()))
+                .filter(e -> e.getCarId().equals(carId))
                 .map(CarStateReportEvent::getCarState);
     }
 }

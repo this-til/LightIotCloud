@@ -1,7 +1,6 @@
 package com.til.light_iot_cloud.context;
 
-import com.til.light_iot_cloud.data.Car;
-import com.til.light_iot_cloud.data.Light;
+import com.til.light_iot_cloud.data.Device;
 import com.til.light_iot_cloud.data.User;
 import com.til.light_iot_cloud.enums.DeviceType;
 import com.til.light_iot_cloud.enums.LinkType;
@@ -17,19 +16,12 @@ public class AuthContext {
 
     User user;
 
-    DeviceType deviceType;
-
     /***
-     * 作为灯杆登入
+     * 作为设备
      * Nullable
      */
-    Light light;
+    Device device;
 
-    /***
-     * 作为检测小车登入
-     * Nullable
-     */
-    Car car;
 
     /***
      * 若为WebSocket 表示对应的链接
@@ -43,13 +35,4 @@ public class AuthContext {
         this.user = user;
     }
 
-    public Long getDeviceId() {
-        if (deviceType == DeviceType.LIGHT) {
-            return light.getId();
-        }
-        if (deviceType == DeviceType.CAR) {
-            return car.getId();
-        }
-        return -1L;
-    }
 }

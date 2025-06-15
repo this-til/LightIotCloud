@@ -1,16 +1,16 @@
 package com.til.light_iot_cloud.controller.mutation;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.til.light_iot_cloud.controller.query.UserController;
-import com.til.light_iot_cloud.data.Car;
-import com.til.light_iot_cloud.data.Light;
+import com.til.light_iot_cloud.data.Device;
 import com.til.light_iot_cloud.data.User;
-import com.til.light_iot_cloud.service.CarService;
-import com.til.light_iot_cloud.service.LightService;
+import com.til.light_iot_cloud.enums.DeviceType;
+import com.til.light_iot_cloud.service.DeviceService;
 import com.til.light_iot_cloud.service.UserService;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -19,10 +19,7 @@ import java.util.List;
 public class UserMutationController {
 
     @Resource
-    private CarService carService;
-
-    @Resource
-    private LightService lightService;
+    private DeviceService deviceService;
 
     @Resource
     private UserService userService;
@@ -30,44 +27,36 @@ public class UserMutationController {
     @Resource
     private UserController userController;
 
-    @SchemaMapping(typeName = "UserMutation")
-    public List<Light> lights(User user) {
-        return userController.lights(user);
-    }
 
     @SchemaMapping(typeName = "UserMutation")
-    public List<Car> cars(User user) {
-        return userController.cars(user);
+    public List<Device> devices(User user, @Argument DeviceType deviceType) {
+        return deviceService.list(
+                new LambdaQueryWrapper<Device>()
+                        .eq(Device::getUserId, user.getId())
+                        .eq(Device::getDeviceType, deviceType)
+        );
     }
 
+    @Nullable
     @SchemaMapping(typeName = "UserMutation")
-    public Light getLightByName(User user, @Argument String name) {
-        return userController.getLightByName(user, name);
+    public Device getDeviceByName(User user, @Argument String name, @Argument DeviceType deviceType) {
+        return deviceService.getOne(
+                new LambdaQueryWrapper<Device>()
+                        .eq(Device::getUserId, user.getId())
+                        .eq(Device::getDeviceType, deviceType)
+                        .eq(Device::getName, name)
+        );
     }
 
+    @Nullable
     @SchemaMapping(typeName = "UserMutation")
-    public Car getCarByName(User user, @Argument String name) {
-        return userController.getCarByName(user, name);
-    }
-
-    @SchemaMapping(typeName = "UserMutation")
-    public Light getLightById(User user, @Argument Long id) {
-        return userController.getLightById(user, id);
-    }
-
-    @SchemaMapping(typeName = "UserMutation")
-    public Car getCarById(User user, @Argument Long id) {
-        return userController.getCarById(user, id);
-    }
-
-    @SchemaMapping(typeName = "UserMutation")
-    public Light existLight(User user, @Argument String name) {
-        return lightService.existLight(user.getId(), name);
-    }
-
-    @SchemaMapping(typeName = "UserMutation")
-    public Car existCar(User user, @Argument String name) {
-        return carService.existCar(user.getId(), name);
+    public Device getDeviceById(User user, @Argument Long id, @Argument DeviceType deviceType) {
+        return deviceService.getOne(
+                new LambdaQueryWrapper<Device>()
+                        .eq(Device::getUserId, user.getId())
+                        .eq(Device::getDeviceType, deviceType)
+                        .eq(Device::getId, id)
+        );
     }
 
 }

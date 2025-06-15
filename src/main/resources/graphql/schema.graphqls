@@ -71,9 +71,22 @@ type Query {
 
     self : User!
 
-    lightSelf : Light!
+    deviceSelf : Device
 
-    carSelf : Car!
+}
+
+type Device {
+    id : ID!
+    userId : ID!
+    name : String!
+    createdAt : DateTime!
+    updatedAt : DateTime!
+    deviceType : DeviceType!
+
+    online : Boolean
+
+    asCar: Car
+    asLight : Light
 }
 
 type User {
@@ -86,16 +99,12 @@ type User {
     phone : String
     email : String
 
-    lights : [Light!]!
-    cars : [Car!]!
-
-    getLightByName(name : String) : Light
-    getCarByName(name : String) : Car
-
-    getLightById(id : ID) : Light
-    getCarById(id : ID) : Car
-
     model: [DetectionModel]
+
+    devices(deviceType : DeviceType) : [Device!]!
+    getDeviceByName(name: String ,deviceType : DeviceType ) : Device
+    getDeviceById(id : ID , deviceType : DeviceType) : Device
+
 
 }
 
@@ -104,20 +113,13 @@ enum UserType {
 }
 
 type Light {
-
-    id : ID!
-    userId : ID!
-    name : String!
-    createdAt : DateTime!
-    updatedAt : DateTime!
-
-    online : Boolean
-
     # 离线时为 null
     lightState : LightState
 
     datas(timeRange : TimeRange) : [LightData!]!
     detectionKeyframes(page : Page, timeRange : TimeRange) : [DetectionKeyframe!]!
+
+    detectionKeyframeCount(timeRange : TimeRange) : Int
 }
 
 type LightData {
@@ -142,9 +144,8 @@ type LightState {
 
 type DetectionKeyframe {
     id : ID!
-    lightId : ID!
+    deviceId : ID!
     time : DateTime!
-    url : String!
 
     detections : [Detection!]!
 }
@@ -164,15 +165,8 @@ type Detection {
 
 }
 
+
 type Car {
-    id : ID!
-    userId : ID!
-    name : String!
-    createdAt : DateTime!
-    updatedAt : DateTime!
-
-    online : Boolean
-
     # 离线时为 null
     carState : CarState
 }
@@ -219,31 +213,28 @@ type Mutation {
     jwtEffective(jwt : String) : Boolean!
 
     self : UserMutation!
-    lightSelf : LightMutation!
-    carSelf : CarMutation!
+    deviceSelf : DeviceMutation!
 
 }
 
 type UserMutation {
-    lights : [LightMutation!]!
-    cars : [CarMutation!]!
+    devices(deviceType : DeviceType) : [DeviceMutation!]!
+    getDeviceByName(name: String ,deviceType : DeviceType ) : DeviceMutation
+    getDeviceById(id : ID , deviceType : DeviceType) : DeviceMutation
+}
 
-    getLightByName(name : String) : LightMutation
-    getCarByName(name : String) : CarMutation
+type DeviceMutation {
+    setConfiguration(key : String, value : String) : Result
 
-    getLightById(id : ID) : LightMutation
-    getCarById(id : ID) : CarMutation
+    asLight : LightMutation!
+    asCarMutation : CarMutation!
 
-    existLight(name : String!) : LightMutation!
-    existCar(name : String!) : CarMutation!
 }
 
 type LightMutation {
     reportUpdate(lightDataInput : LightDataInput) : Result
     reportState(lightState : LightStateInput) : Result
     reportDetection(detectionInput : DetectionInput) : Result
-
-    setConfiguration(key : String, value : String) : Result
 
     # 设置亮度
     setGear(value : Int) : Result
@@ -285,11 +276,15 @@ input LightDataInput  {
 
 type CarMutation {
 
-    reportState(carState : LightStateInput) : Result
+    reportState(carState : CarStateInput) : Result
 
     setConfiguration(key : String, value : String) : Result
 
     operationCar(operationCarInput : OperationCarInput) : Result
+}
+
+input  CarStateInput {
+    TODO : Int
 }
 
 input OperationCarInput {
@@ -311,9 +306,6 @@ type Subscription {
 
     updateConfigurationEvent : UpdateConfigurationEvent
 
-    # light
-
-
     # car
     operationCarEvent : OperationCarEvent
 }
@@ -327,6 +319,7 @@ extend type Subscription {
 
     lightStateReportEvent(lightId : Int) : LightState
     lightDataReportEvent(lightId : Int) : LightData
+    lightDetectionReportEvent(lightId: Int) : DetectionKeyframe
 
     carStateReportEvent(carId : Int) : CarState
 }
@@ -349,16 +342,8 @@ type OperationCarEvent {
 type DeviceOnlineStateSwitchEvent {
 
     onlineState : OnlineState!
-    deviceType : DeviceType!
-    deviceId : ID!
+    device: Device!
 
-    # 如果作为灯则非空
-    light: Light
-
-    # 如果作为车则非空
-    car : Car
-
-    deviceName : String
 }
 
 

@@ -6,8 +6,7 @@ import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.data.*;
 import com.til.light_iot_cloud.enums.DeviceType;
 import com.til.light_iot_cloud.enums.LinkType;
-import com.til.light_iot_cloud.service.CarService;
-import com.til.light_iot_cloud.service.LightService;
+import com.til.light_iot_cloud.service.DeviceService;
 import com.til.light_iot_cloud.service.UserService;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
@@ -25,7 +24,6 @@ import java.util.Objects;
 @Component
 public class ConnectionInterceptor implements WebSocketGraphQlInterceptor {
 
-
     public static final String AUTHORIZATION = "Authorization";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
@@ -35,12 +33,6 @@ public class ConnectionInterceptor implements WebSocketGraphQlInterceptor {
     public static final String AUTH_CONTEXT = "authContext";
 
     @Resource
-    private CarService carService;
-
-    @Resource
-    private LightService lightService;
-
-    @Resource
     private UserService userService;
 
     @Resource
@@ -48,6 +40,9 @@ public class ConnectionInterceptor implements WebSocketGraphQlInterceptor {
 
     @Resource
     private JwtTokenConfig jwtTokenConfig;
+
+    @Resource
+    private DeviceService deviceService;
 
 
     @SneakyThrows
@@ -101,7 +96,6 @@ public class ConnectionInterceptor implements WebSocketGraphQlInterceptor {
 
         if (linkType == LinkType.WEBSOCKET) {
             AuthContext authContext = new AuthContext(LinkType.WEBSOCKET, user);
-            info.getAttributes().put(LINK_TYPE, LinkType.WEBSOCKET);
             info.getAttributes().put(AUTH_CONTEXT, authContext);
             return Mono.just(payload);
         }
@@ -134,28 +128,13 @@ public class ConnectionInterceptor implements WebSocketGraphQlInterceptor {
         AuthContext authContext = new AuthContext(LinkType.DEVICE_WEBSOCKET, user);
         authContext.setWebSocketSession(session);
         authContext.setWebSocketSessionInfo(info);
-        authContext.setDeviceType(deviceType);
 
-        info.getAttributes().put(LINK_TYPE, LinkType.DEVICE_WEBSOCKET);
-        info.getAttributes().put(DEVICE_TYPE, deviceTypeStr);
+        Device device = deviceService.existDevice(user.getId(), deviceName, deviceType);
+        authContext.setDevice(device);
 
-        synchronized (this) {
-            switch (deviceType) {
-                case LIGHT -> {
-                    Light light = lightService.existLight(user.getId(), deviceName);
-                    authContext.setLight(light);
-                    info.getAttributes().put(AUTH_CONTEXT, authContext);
-                }
-                case CAR -> {
-                    Car car = carService.existCar(user.getId(), deviceName);
-                    authContext.setCar(car);
-                    info.getAttributes().put(AUTH_CONTEXT, authContext);
-                }
-            }
-
-            deviceConnectionManager.registerSession(authContext);
-            return Mono.just(payload);
-        }
+        deviceConnectionManager.registerSession(authContext);
+        info.getAttributes().put(AUTH_CONTEXT, authContext);
+        return Mono.just(payload);
     }
 
     @Override

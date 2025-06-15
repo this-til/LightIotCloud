@@ -31,13 +31,14 @@ public class SubscriptionController {
             throw new IllegalArgumentException("Unsupported link type: " + linkType);
         }
 
-        DeviceType deviceType = authContext.getDeviceType();
-        Long deviceId = authContext.getDeviceId();
+        DeviceType deviceType = authContext.getDevice().getDeviceType();
+        Long deviceId = authContext.getDevice().getUserId();
+
         return sinkEventHolder
                 .getSinks(UpdateConfigurationEvent.class)
                 .asFlux()
-                .filter(e -> e.getDeviceType().equals(deviceType))
-                .filter(e -> e.getDeviceId().equals(deviceId));
+                .filter(e -> e.getDevice().getId().equals(deviceId))
+                .filter(e -> e.getDevice().getDeviceType().equals(deviceType));
     }
 
     @SubscriptionMapping
@@ -48,19 +49,19 @@ public class SubscriptionController {
             throw new IllegalArgumentException("Unsupported link type: " + linkType);
         }
 
-        DeviceType deviceType = authContext.getDeviceType();
+        DeviceType deviceType = authContext.getDevice().getDeviceType();
         if (deviceType != DeviceType.CAR) {
             throw new IllegalArgumentException("Unsupported device type: " + deviceType);
         }
 
-        Long id = authContext.getCar().getId();
+        Long id = authContext.getDevice().getUserId();
+
         return sinkEventHolder
                 .getSinks(OperationCarEvent.class)
                 .asFlux()
                 .filter(e -> e.getCarId().equals(id))
                 .map(OperationCarEvent::getOperationCarInput);
     }
-
 
 
 }

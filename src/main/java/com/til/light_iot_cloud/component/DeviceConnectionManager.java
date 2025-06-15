@@ -1,6 +1,7 @@
 package com.til.light_iot_cloud.component;
 
 import com.til.light_iot_cloud.context.AuthContext;
+import com.til.light_iot_cloud.data.Device;
 import com.til.light_iot_cloud.enums.DeviceType;
 import com.til.light_iot_cloud.enums.LinkType;
 import com.til.light_iot_cloud.enums.OnlineState;
@@ -25,9 +26,7 @@ public class DeviceConnectionManager {
     private SinkEventHolder sinkEventHolder;
 
     private final Map<String, AuthContext> sessions = new ConcurrentHashMap<>();
-
-    private final Map<Long, Map<String, WebSocketSessionInfo>> lightSessions = new ConcurrentHashMap<>();
-    private final Map<Long, Map<String, WebSocketSessionInfo>> carSessions = new ConcurrentHashMap<>();
+    private final Map<Long, Map<String, WebSocketSessionInfo>> devices = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void init() {
@@ -58,37 +57,17 @@ public class DeviceConnectionManager {
 
         sessions.put(socketId, authContext);
 
-        switch (authContext.getDeviceType()) {
-            case LIGHT -> {
-                Long id = authContext.getLight().getId();
-                Map<String, WebSocketSessionInfo> map = lightSessions.computeIfAbsent(id, ___ -> {
-                    sinkEventHolder.publishEvent(
-                            new DeviceOnlineStateSwitchEvent(
-                                    OnlineState.ONLINE,
-                                    DeviceType.LIGHT,
-                                    id
-                            )
-                    );
-                    return new ConcurrentHashMap<>();
-                });
-                map.put(socketId, webSocketSessionInfo);
-            }
-            case CAR -> {
-                Long id = authContext.getCar().getId();
-                Map<String, WebSocketSessionInfo> map = carSessions.computeIfAbsent(id, ___ -> {
-                    sinkEventHolder.publishEvent(
-                            new DeviceOnlineStateSwitchEvent(
-                                    OnlineState.ONLINE,
-                                    DeviceType.CAR,
-                                    id
-                            )
-                    );
-                    return new ConcurrentHashMap<>();
-                });
-                map.put(socketId, webSocketSessionInfo);
-            }
-        }
-
+        Long id = authContext.getDevice().getId();
+        Map<String, WebSocketSessionInfo> map = devices.computeIfAbsent(id, ___ -> {
+            sinkEventHolder.publishEvent(
+                    new DeviceOnlineStateSwitchEvent(
+                            OnlineState.ONLINE,
+                            authContext.getDevice()
+                    )
+            );
+            return new ConcurrentHashMap<>();
+        });
+        map.put(socketId, webSocketSessionInfo);
     }
 
     @SneakyThrows
@@ -104,42 +83,22 @@ public class DeviceConnectionManager {
             return;
         }
 
-        switch (authContext.getDeviceType()) {
-            case LIGHT -> {
-                Long id = authContext.getLight().getId();
-                if (lightSessions.containsKey(id)) {
-                    Map<String, WebSocketSessionInfo> map = lightSessions.get(id);
-                    map.remove(sessionId);
-                    if (map.isEmpty()) {
-                        lightSessions.remove(id);
-                        sinkEventHolder.publishEvent(
-                                new DeviceOnlineStateSwitchEvent(
-                                        OnlineState.OFFLINE,
-                                        DeviceType.LIGHT,
-                                        id
-                                )
-                        );
-                    }
-                }
-            }
-            case CAR -> {
-                Long id = authContext.getCar().getId();
-                if (carSessions.containsKey(id)) {
-                    Map<String, WebSocketSessionInfo> map = carSessions.get(id);
-                    map.remove(sessionId);
-                    if (map.isEmpty()) {
-                        carSessions.remove(id);
-                        sinkEventHolder.publishEvent(
-                                new DeviceOnlineStateSwitchEvent(
-                                        OnlineState.OFFLINE,
-                                        DeviceType.CAR,
-                                        id
-                                )
-                        );
-                    }
-                }
+        Long id = authContext.getDevice().getId();
+
+        if (devices.containsKey(id)) {
+            Map<String, WebSocketSessionInfo> map = devices.get(id);
+            map.remove(sessionId);
+            if (map.isEmpty()) {
+                devices.remove(id);
+                sinkEventHolder.publishEvent(
+                        new DeviceOnlineStateSwitchEvent(
+                                OnlineState.OFFLINE,
+                                authContext.getDevice()
+                        )
+                );
             }
         }
+
     }
 
     @Nullable
@@ -148,13 +107,9 @@ public class DeviceConnectionManager {
     }
 
     @Nullable
-    public Map<String, WebSocketSessionInfo> getPublisherByLightId(Long lightId) {
-        return lightSessions.get(lightId);
+    public Map<String, WebSocketSessionInfo> getPublisherByDeviceId(Long deviceId) {
+        return devices.get(deviceId);
     }
 
-    @Nullable
-    public Map<String, WebSocketSessionInfo> getPublisherByCarId(Long carId) {
-        return carSessions.get(carId);
-    }
 
 }
