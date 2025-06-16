@@ -45,11 +45,11 @@ public class LightController {
         DeviceContext deviceContext = deviceRunManager.getDeviceContext(light.getId());
 
         if (deviceContext == null) {
-            throw new IllegalArgumentException("No device context found for " + light.getId());
+            return null;
         }
 
         if (!(deviceContext instanceof DeviceContext.LightContext lightContext)) {
-            throw new IllegalArgumentException("Device context is not a LightContext");
+            return null;
         }
 
         return lightContext.getLightState();

@@ -21,13 +21,16 @@ public class DetectionController {
 
     @SchemaMapping(typeName = "Detection")
     public String model(Detection detection) {
+        if (detection.getModel() != null) {
+            return detection.getModel();
+        }
         DetectionItem item = detectionItemService.getOne(
                 new LambdaQueryWrapper<DetectionItem>()
                         .eq(DetectionItem::getId, detection.getItemId())
         );
 
         if (item == null) {
-            return "null";
+            return null;
         }
 
         DetectionModel model = detectionModelService.getOne(
@@ -36,7 +39,7 @@ public class DetectionController {
         );
 
         if (model == null) {
-            return "null";
+            return null;
         }
 
         return model.getName();
@@ -45,13 +48,18 @@ public class DetectionController {
 
     @SchemaMapping(typeName = "Detection")
     public String item(Detection detection) {
+
+        if (detection.getItem() != null) {
+            return detection.getItem();
+        }
+
         DetectionItem item = detectionItemService.getOne(
                 new LambdaQueryWrapper<DetectionItem>()
                         .eq(DetectionItem::getId, detection.getItemId())
         );
 
         if (item == null) {
-            return "null";
+            return null;
         }
 
         return item.getName();

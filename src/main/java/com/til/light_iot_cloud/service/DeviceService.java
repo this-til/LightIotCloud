@@ -1,12 +1,15 @@
 package com.til.light_iot_cloud.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.til.light_iot_cloud.data.Device;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.til.light_iot_cloud.enums.DeviceType;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author cat
@@ -85,4 +88,20 @@ public interface DeviceService extends IService<Device> {
         }
     }
 
+    /**
+     * 批量更新设备的最后更新时间
+     *
+     * @param deviceIds 设备ID集合
+     */
+    default void batchUpdateLastUpdateTime(Set<Long> deviceIds) {
+        if (deviceIds == null || deviceIds.isEmpty()) {
+            return;
+        }
+
+        this.update(
+                new LambdaUpdateWrapper<Device>()
+                        .set(Device::getUpdatedAt, OffsetDateTime.now())
+                        .in(Device::getId, deviceIds)
+        );
+    }
 }

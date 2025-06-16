@@ -5,6 +5,9 @@ scalar DateTime
 
 scalar Bytes
 
+scalar JSON
+
+
 schema {
     query:  Query
     mutation: Mutation
@@ -225,6 +228,7 @@ type UserMutation {
 
 type DeviceMutation {
     setConfiguration(key : String, value : String) : Result
+    commandDown(key : String, value : String) : Result
 
     asLight : LightMutation!
     asCarMutation : CarMutation!
@@ -235,12 +239,17 @@ type LightMutation {
     reportUpdate(lightDataInput : LightDataInput) : Result
     reportState(lightState : LightStateInput) : Result
     reportDetection(detectionInput : DetectionInput) : Result
+    sustainedReportDetection(items : [DetectionItemInput]) : Result
 
     # 设置亮度
-    setGear(value : Int) : Result
+    setGear(value : Int!) : Result
 
     # 设置自动亮度调节
-    setAutomaticGear(value : Boolean) : Result
+    setAutomaticGear(value : Boolean!) : Result
+
+    # 设置持续检测
+    setSustainedDetection(modelName : String) : Result
+    closeSustainedDetection : Result
 }
 
 # noinspection GraphQLUnresolvedReference,GraphQLMissingType
@@ -305,6 +314,7 @@ input OperationCarInput {
 type Subscription {
 
     updateConfigurationEvent : UpdateConfigurationEvent
+    commandDownEvent : CommandDownEvent
 
     # car
     operationCarEvent : OperationCarEvent
@@ -313,19 +323,25 @@ type Subscription {
 # web
 extend type Subscription {
 
-    testSubscription : Int
+    testSubscription : Int!
 
-    deviceOnlineStateSwitchEvent : DeviceOnlineStateSwitchEvent
+    deviceOnlineStateSwitchEvent : DeviceOnlineStateSwitchEvent!
 
-    lightStateReportEvent(lightId : Int) : LightState
-    lightDataReportEvent(lightId : Int) : LightData
-    lightDetectionReportEvent(lightId: Int) : DetectionKeyframe
+    lightStateReportEvent(lightId : Int!) : LightState!
+    lightDataReportEvent(lightId : Int!) : LightData!
+    lightDetectionReportEvent(lightId: Int!) : DetectionKeyframe!
+    lightSustainedDetectionReportEvent(lightId: Int!) : [Detection!]!
 
-    carStateReportEvent(carId : Int) : CarState
+    carStateReportEvent(carId : Int!) : CarState!
 }
 
 type UpdateConfigurationEvent {
     key : String!
+    value : String!
+}
+
+type CommandDownEvent {
+    key: String
     value : String!
 }
 

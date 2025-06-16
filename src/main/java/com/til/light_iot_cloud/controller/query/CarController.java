@@ -20,11 +20,11 @@ public class CarController {
         DeviceContext deviceContext = deviceRunManager.getDeviceContext(car.getId());
 
         if (deviceContext == null) {
-            throw new IllegalArgumentException("No device context found for " + car.getId());
+            return null;
         }
 
         if (!(deviceContext instanceof DeviceContext.CarContext carContext)) {
-            throw new IllegalArgumentException("Device context is not a car context");
+            return null;
         }
 
         return carContext.getCarState();

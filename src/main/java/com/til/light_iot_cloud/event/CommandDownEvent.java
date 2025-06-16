@@ -1,19 +1,14 @@
 package com.til.light_iot_cloud.event;
 
 import com.til.light_iot_cloud.data.Device;
-import com.til.light_iot_cloud.enums.DeviceType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
-import org.springframework.context.ApplicationEvent;
 
-@Getter
+@Data
 @AllArgsConstructor
-public class UpdateConfigurationEvent implements ISinksEvent {
-
+public class CommandDownEvent implements  ISinksEvent {
     Long deviceId;
 
     String key;
     String value;
-
 }

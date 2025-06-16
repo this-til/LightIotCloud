@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.Date;
 
 import com.til.light_iot_cloud.enums.DeviceType;
 import lombok.Data;

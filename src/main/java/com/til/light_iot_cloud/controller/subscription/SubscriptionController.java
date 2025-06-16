@@ -5,6 +5,7 @@ import com.til.light_iot_cloud.component.SinkEventHolder;
 import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.data.input.OperationCarInput;
 import com.til.light_iot_cloud.enums.DeviceType;
+import com.til.light_iot_cloud.event.CommandDownEvent;
 import com.til.light_iot_cloud.event.OperationCarEvent;
 import com.til.light_iot_cloud.event.UpdateConfigurationEvent;
 import com.til.light_iot_cloud.enums.LinkType;
@@ -31,15 +32,30 @@ public class SubscriptionController {
             throw new IllegalArgumentException("Unsupported link type: " + linkType);
         }
 
-        DeviceType deviceType = authContext.getDevice().getDeviceType();
         Long deviceId = authContext.getDevice().getUserId();
 
         return sinkEventHolder
                 .getSinks(UpdateConfigurationEvent.class)
                 .asFlux()
-                .filter(e -> e.getDevice().getId().equals(deviceId))
-                .filter(e -> e.getDevice().getDeviceType().equals(deviceType));
+                .filter(e -> e.getDeviceId().equals(deviceId));
     }
+
+    @SubscriptionMapping
+    public Flux<CommandDownEvent> commandDownEvent(@ContextValue AuthContext authContext) {
+        LinkType linkType = authContext.getLinkType();
+
+        if (linkType != LinkType.DEVICE_WEBSOCKET) {
+            throw new IllegalArgumentException("Unsupported link type: " + linkType);
+        }
+
+        Long deviceId = authContext.getDevice().getUserId();
+
+        return sinkEventHolder
+                .getSinks(CommandDownEvent.class)
+                .asFlux()
+                .filter(e -> e.getDeviceId().equals(deviceId));
+    }
+
 
     @SubscriptionMapping
     public Flux<OperationCarInput> operationCarEvent(@ContextValue AuthContext authContext) {

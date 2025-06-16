@@ -27,7 +27,7 @@ public class QueryController {
     @QueryMapping
     public User self(@ContextValue AuthContext authContext) {
         if (authContext.getUser() == null) {
-            throw new SecurityException("You are not logged in");
+            return null;
         }
         return authContext.getUser();
     }
@@ -35,7 +35,7 @@ public class QueryController {
     @QueryMapping
     public Device deviceSelf(@ContextValue AuthContext authContext) {
         if (authContext.getLinkType() != LinkType.DEVICE_WEBSOCKET) {
-            throw new IllegalArgumentException("linkType is not DEVICE_WEBSOCKET");
+            return null;
         }
         return authContext.getDevice();
     }

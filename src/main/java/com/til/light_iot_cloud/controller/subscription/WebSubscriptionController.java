@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
 
 import java.time.Duration;
+import java.util.List;
 
 @Controller
 public class WebSubscriptionController {
@@ -91,12 +92,30 @@ public class WebSubscriptionController {
             throw new IllegalArgumentException("No such light");
         }
 
-
         return sinkEventHolder.getSinks(LightDetectionReportEvent.class)
                 .asFlux()
                 .filter(e -> e.getLightId().equals(lightId))
                 .map(LightDetectionReportEvent::getDetectionKeyframe);
 
+    }
+
+    @SubscriptionMapping
+    public Flux<List<Detection>> lightSustainedDetectionReportEvent(@ContextValue AuthContext authContext, @Argument Long lightId) {
+
+        if (authContext.getLinkType() != LinkType.WEBSOCKET) {
+            throw new IllegalArgumentException("Only websocket links are supported");
+        }
+
+        Device device = deviceService.getDeviceById(authContext.getUser().getId(), lightId, DeviceType.LIGHT);
+
+        if (device == null) {
+            throw new IllegalArgumentException("No such light");
+        }
+
+        return sinkEventHolder.getSinks(LightSustainedDetectionReportEvent.class)
+                .asFlux()
+                .filter(e -> e.getLightId().equals(lightId))
+                .map(LightSustainedDetectionReportEvent::getDetections);
     }
 
     @SubscriptionMapping

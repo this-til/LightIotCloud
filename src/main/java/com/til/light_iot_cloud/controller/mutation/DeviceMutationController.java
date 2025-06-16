@@ -4,6 +4,7 @@ import com.til.light_iot_cloud.component.SinkEventHolder;
 import com.til.light_iot_cloud.data.Device;
 import com.til.light_iot_cloud.data.Result;
 import com.til.light_iot_cloud.enums.DeviceType;
+import com.til.light_iot_cloud.event.CommandDownEvent;
 import com.til.light_iot_cloud.event.UpdateConfigurationEvent;
 import com.til.light_iot_cloud.service.DeviceService;
 import jakarta.annotation.Resource;
@@ -21,7 +22,13 @@ public class DeviceMutationController {
 
     @SchemaMapping(typeName = "DeviceMutation")
     public Result<Void> setConfiguration(Device device, @Argument String key, @Argument String value) {
-        sinkEventHolder.publishEvent(new UpdateConfigurationEvent(device, key, value));
+        sinkEventHolder.publishEvent(new UpdateConfigurationEvent(device.getId(), key, value));
+        return Result.successful();
+    }
+
+    @SchemaMapping(typeName = "DeviceMutation")
+    public Result<Void> commandDown(Device device, @Argument String key, @Argument String value) {
+        sinkEventHolder.publishEvent(new CommandDownEvent(device.getId(), key, value));
         return Result.successful();
     }
 

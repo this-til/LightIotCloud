@@ -67,6 +67,7 @@ public class GraphQLConfig {
     public RuntimeWiringConfigurer runtimeWiringConfigurer() {
         return wiringBuilder -> {
             wiringBuilder.scalar(ExtendedScalars.DateTime);
+            wiringBuilder.scalar(ExtendedScalars.Json);
             wiringBuilder.scalar(BYTE_ARRAY);
         };
     }

@@ -9,12 +9,10 @@ import com.til.light_iot_cloud.data.input.DetectionInput;
 import com.til.light_iot_cloud.data.input.DetectionItemInput;
 import com.til.light_iot_cloud.data.LightState;
 import com.til.light_iot_cloud.enums.DeviceType;
-import com.til.light_iot_cloud.event.LightDataReportEvent;
-import com.til.light_iot_cloud.event.LightDetectionReportEvent;
-import com.til.light_iot_cloud.event.LightStateReportEvent;
-import com.til.light_iot_cloud.event.UpdateConfigurationEvent;
+import com.til.light_iot_cloud.event.*;
 import com.til.light_iot_cloud.service.*;
 import jakarta.annotation.Resource;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
@@ -100,7 +98,6 @@ public class LightMutationController {
     @SchemaMapping(typeName = "LightMutation")
     @Transactional
     public Result<Void> reportDetection(Device light, @Argument DetectionInput detectionInput) {
-
         DeviceContext deviceContext = deviceRunManager.getDeviceContext(light.getId());
 
         if (deviceContext == null) {
@@ -153,17 +150,9 @@ public class LightMutationController {
 
                 for(DetectionItemInput detectionItemInput : itemEntry.getValue()) {
 
-                    Detection detection = new Detection();
-
-                    detection.setProbability(detectionItemInput.getProbability());
-                    detection.setW(detectionItemInput.getW());
-                    detection.setH(detectionItemInput.getH());
-                    detection.setX(detectionItemInput.getX());
-                    detection.setY(detectionItemInput.getY());
-
-                    detection.setItemId(detectionItem.getId());
+                    Detection detection = detectionItemInput.asDetection();
                     detection.setKeyframeId(detectionKeyframe.getId());
-
+                    detection.setItemId(detectionItem.getId());
                     detectionList.add(detection);
 
                 }
@@ -181,6 +170,20 @@ public class LightMutationController {
         return Result.ofBool(true);
     }
 
+
+    @SchemaMapping(typeName = "LightMutation")
+    public Result<Void> sustainedReportDetection(Device light, @Argument List<DetectionItemInput> items) {
+
+        sinkEventHolder.publishEvent(
+                new LightSustainedDetectionReportEvent(
+                        light.getId(),
+                        items.stream().map(DetectionItemInput::asDetection).toList()
+                )
+        );
+
+        return Result.successful();
+    }
+
     @SchemaMapping(typeName = "LightMutation")
     public Result<Void> setGear(Device light, @Argument Integer value) {
         return deviceMutationController.setConfiguration(light, "Device.Gear", value.toString());
@@ -191,5 +194,14 @@ public class LightMutationController {
         return deviceMutationController.setConfiguration(light, "Device.Switch", value.toString());
     }
 
+    @SchemaMapping(typeName = "LightMutation")
+    public Result<Void> setSustainedDetection(Device light, @Argument String modelName) {
+        return deviceMutationController.commandDown(light, "Detection.Sustained", modelName);
+    }
+
+    @SchemaMapping(typeName = "LightMutation")
+    public Result<Void> closeSustainedDetection(Device light) {
+        return deviceMutationController.commandDown(light, "Detection.Sustained", "null");
+    }
 
 }
