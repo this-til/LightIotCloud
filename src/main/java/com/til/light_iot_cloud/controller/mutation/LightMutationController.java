@@ -177,7 +177,9 @@ public class LightMutationController {
         sinkEventHolder.publishEvent(
                 new LightSustainedDetectionReportEvent(
                         light.getId(),
-                        items.stream().map(DetectionItemInput::asDetection).toList()
+                        items.stream()
+                                .map(DetectionItemInput::asDetection)
+                                .toList()
                 )
         );
 

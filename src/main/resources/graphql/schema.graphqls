@@ -141,7 +141,8 @@ type LightData {
 }
 
 type LightState {
-    enableWirelessCharging : Boolean
+    wirelessChargingElectricity : Float
+    wirelessChargingVoltage : Float
     wirelessChargingPower : Float
 }
 
@@ -154,9 +155,9 @@ type DetectionKeyframe {
 }
 
 type Detection {
-    id : ID!
-    keyframeId : ID!
-    itemId : ID!
+    # id : ID!
+    # keyframeId : ID!
+    # itemId : ID!
     x : Float!
     y : Float!
     w : Float!
@@ -269,7 +270,8 @@ input DetectionItemInput {
 }
 
 input LightStateInput {
-    enableWirelessCharging : Boolean
+    wirelessChargingElectricity : Float
+    wirelessChargingVoltage : Float
     wirelessChargingPower : Float
 }
 

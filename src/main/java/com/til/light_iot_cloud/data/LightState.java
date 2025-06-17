@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class LightState {
-    Boolean enableWirelessCharging;
+    Float wirelessChargingElectricity;
+    Float wirelessChargingVoltage;
     Float wirelessChargingPower;
 }

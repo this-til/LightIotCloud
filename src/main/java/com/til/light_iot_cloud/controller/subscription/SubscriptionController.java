@@ -32,7 +32,7 @@ public class SubscriptionController {
             throw new IllegalArgumentException("Unsupported link type: " + linkType);
         }
 
-        Long deviceId = authContext.getDevice().getUserId();
+        Long deviceId = authContext.getDevice().getId();
 
         return sinkEventHolder
                 .getSinks(UpdateConfigurationEvent.class)
@@ -48,7 +48,7 @@ public class SubscriptionController {
             throw new IllegalArgumentException("Unsupported link type: " + linkType);
         }
 
-        Long deviceId = authContext.getDevice().getUserId();
+        Long deviceId = authContext.getDevice().getId();
 
         return sinkEventHolder
                 .getSinks(CommandDownEvent.class)
@@ -70,7 +70,7 @@ public class SubscriptionController {
             throw new IllegalArgumentException("Unsupported device type: " + deviceType);
         }
 
-        Long id = authContext.getDevice().getUserId();
+        Long id = authContext.getDevice().getId();
 
         return sinkEventHolder
                 .getSinks(OperationCarEvent.class)
