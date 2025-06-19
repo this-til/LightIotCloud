@@ -4,6 +4,10 @@ import lombok.Data;
 
 @Data
 public class LightState {
+    Float electricity;
+    Float voltage;
+    Float power;
+
     Float wirelessChargingElectricity;
     Float wirelessChargingVoltage;
     Float wirelessChargingPower;

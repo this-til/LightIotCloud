@@ -6,7 +6,6 @@ import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.data.input.OperationCarInput;
 import com.til.light_iot_cloud.enums.DeviceType;
 import com.til.light_iot_cloud.event.CommandDownEvent;
-import com.til.light_iot_cloud.event.OperationCarEvent;
 import com.til.light_iot_cloud.event.UpdateConfigurationEvent;
 import com.til.light_iot_cloud.enums.LinkType;
 import jakarta.annotation.Resource;
@@ -55,29 +54,5 @@ public class SubscriptionController {
                 .asFlux()
                 .filter(e -> e.getDeviceId().equals(deviceId));
     }
-
-
-    @SubscriptionMapping
-    public Flux<OperationCarInput> operationCarEvent(@ContextValue AuthContext authContext) {
-        LinkType linkType = authContext.getLinkType();
-
-        if (linkType != LinkType.DEVICE_WEBSOCKET) {
-            throw new IllegalArgumentException("Unsupported link type: " + linkType);
-        }
-
-        DeviceType deviceType = authContext.getDevice().getDeviceType();
-        if (deviceType != DeviceType.CAR) {
-            throw new IllegalArgumentException("Unsupported device type: " + deviceType);
-        }
-
-        Long id = authContext.getDevice().getId();
-
-        return sinkEventHolder
-                .getSinks(OperationCarEvent.class)
-                .asFlux()
-                .filter(e -> e.getCarId().equals(id))
-                .map(OperationCarEvent::getOperationCarInput);
-    }
-
 
 }

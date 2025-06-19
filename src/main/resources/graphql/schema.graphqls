@@ -43,11 +43,19 @@ input TimeRange {
 enum DeviceType {
     CAR
     LIGHT
+    UAV
 }
 
 enum OnlineState {
     ONLINE
     OFFLINE
+}
+
+enum PtzControl {
+    TILT_UP
+    TILT_DOWN
+    PAN_LEFT
+    PAN_RIGHT
 }
 
 type MatPack {
@@ -141,6 +149,10 @@ type LightData {
 }
 
 type LightState {
+    electricity : Float
+    voltage : Float
+    power : Float
+
     wirelessChargingElectricity : Float
     wirelessChargingVoltage : Float
     wirelessChargingPower : Float
@@ -231,22 +243,38 @@ type DeviceMutation {
     setConfiguration(key : String, value : String) : Result
     commandDown(key : String, value : String) : Result
 
+    reportDetection(detectionInput : DetectionInput) : Result
+    sustainedReportDetection(items : [DetectionItemInput]) : Result
+
     asLight : LightMutation!
     asCarMutation : CarMutation!
 
 }
 
+enum LightCommandKey {
+    CAMERA_PTZ_CONTROL
+    DEVICE_GEAR
+    DEVICE_SWITCH
+    DEVICE_ROLLING_DOOR
+    DETECTION_SUSTAINED
+}
+
 type LightMutation {
     reportUpdate(lightDataInput : LightDataInput) : Result
     reportState(lightState : LightStateInput) : Result
-    reportDetection(detectionInput : DetectionInput) : Result
-    sustainedReportDetection(items : [DetectionItemInput]) : Result
+
+    commandDown(key : LightCommandKey, value : String) : Result
+
+    ptzControl(ptzControl : PtzControl) : Result
 
     # 设置亮度
     setGear(value : Int!) : Result
 
     # 设置自动亮度调节
     setAutomaticGear(value : Boolean!) : Result
+
+    # 设置卷帘门开闭 true：开启
+    setRollingDoor(open : Boolean!) : Result
 
     # 设置持续检测
     setSustainedDetection(modelName : String) : Result
@@ -270,6 +298,10 @@ input DetectionItemInput {
 }
 
 input LightStateInput {
+    electricity : Float
+    voltage : Float
+    power : Float
+
     wirelessChargingElectricity : Float
     wirelessChargingVoltage : Float
     wirelessChargingPower : Float
@@ -285,27 +317,33 @@ input LightDataInput  {
     windDirection : Float
 }
 
+enum CarCommandKey {
+    OPERATION
+}
+
 type CarMutation {
+
+    commandDown(key : CarCommandKey, value : String) : Result
+
 
     reportState(carState : CarStateInput) : Result
 
-    setConfiguration(key : String, value : String) : Result
-
-    operationCar(operationCarInput : OperationCarInput) : Result
+    operationCar(operationCar : OperationCar) : Result
 }
+
+enum OperationCar {
+    translationAdvance
+    translationLeft
+    translationRetreat
+    translationRight
+    angularLeft
+    angularRight
+    stop
+}
+
 
 input  CarStateInput {
     TODO : Int
-}
-
-input OperationCarInput {
-    translationAdvance : Boolean
-    translationLeft : Boolean
-    translationRetreat : Boolean
-    translationRight : Boolean
-    angularLeft : Boolean
-    angularRight : Boolean
-    stop : Boolean
 }
 
 # -----------------------Mutation-----------------------
@@ -314,12 +352,8 @@ input OperationCarInput {
 
 #设备使用
 type Subscription {
-
     updateConfigurationEvent : UpdateConfigurationEvent
     commandDownEvent : CommandDownEvent
-
-    # car
-    operationCarEvent : OperationCarEvent
 }
 
 # web
@@ -347,15 +381,6 @@ type CommandDownEvent {
     value : String!
 }
 
-type OperationCarEvent {
-    translationAdvance : Boolean
-    translationLeft : Boolean
-    translationRetreat : Boolean
-    translationRight : Boolean
-    angularLeft : Boolean
-    angularRight : Boolean
-    stop : Boolean
-}
 
 type DeviceOnlineStateSwitchEvent {
 
