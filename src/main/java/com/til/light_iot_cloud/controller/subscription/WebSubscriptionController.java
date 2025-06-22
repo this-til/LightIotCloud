@@ -135,4 +135,23 @@ public class WebSubscriptionController {
                 .filter(e -> e.getCarId().equals(carId))
                 .map(CarStateReportEvent::getCarState);
     }
+
+    @SubscriptionMapping
+    public Flux<UavState> uavStateReportEvent(@ContextValue AuthContext authContext, @Argument Long uavId) {
+
+        if (authContext.getLinkType() != LinkType.WEBSOCKET) {
+            throw new IllegalArgumentException("Only websocket links are supported");
+        }
+
+        Device device = deviceService.getDeviceById(authContext.getUser().getId(), uavId, DeviceType.CAR);
+
+        if (device == null) {
+            throw new IllegalArgumentException("No such light");
+        }
+
+        return sinkEventHolder.getSinks(UavStateReportEvent.class)
+                .asFlux()
+                .filter(e -> e.getDevice().equals(uavId))
+                .map(UavStateReportEvent::getUavState);
+    }
 }

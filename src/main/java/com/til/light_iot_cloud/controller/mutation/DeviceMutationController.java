@@ -170,7 +170,7 @@ public class DeviceMutationController {
     }
 
     @SchemaMapping(typeName = "DeviceMutation")
-    public Device asCarMutation(Device device) {
+    public Device asCar(Device device) {
         if (!device.getDeviceType().equals(DeviceType.CAR)) {
             throw new IllegalArgumentException("Device type is not Car");
         }

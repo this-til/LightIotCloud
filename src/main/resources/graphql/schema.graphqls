@@ -213,6 +213,14 @@ input ModelSelect {
     itemIds : [Int]
 }
 
+type Uav {
+    uavState : UavState
+}
+
+type UavState {
+    TODO : Int
+}
+
 # -----------------------Query-----------------------
 
 # -----------------------Mutation-----------------------
@@ -247,7 +255,7 @@ type DeviceMutation {
     sustainedReportDetection(items : [DetectionItemInput]) : Result
 
     asLight : LightMutation!
-    asCarMutation : CarMutation!
+    asCar: CarMutation!
 
 }
 
@@ -257,6 +265,9 @@ enum LightCommandKey {
     DEVICE_SWITCH
     DEVICE_ROLLING_DOOR
     DETECTION_SUSTAINED
+
+    BROADCAST_FILE
+    BROADCAST_STOP
 }
 
 type LightMutation {
@@ -279,6 +290,9 @@ type LightMutation {
     # 设置持续检测
     setSustainedDetection(modelName : String) : Result
     closeSustainedDetection : Result
+
+    broadcastFile(fileName : String) : Result
+    broadcastStop : Result
 }
 
 # noinspection GraphQLUnresolvedReference,GraphQLMissingType
@@ -319,6 +333,9 @@ input LightDataInput  {
 
 enum CarCommandKey {
     OPERATION
+
+    BROADCAST_FILE
+    BROADCAST_STOP
 }
 
 type CarMutation {
@@ -329,6 +346,9 @@ type CarMutation {
     reportState(carState : CarStateInput) : Result
 
     operationCar(operationCar : OperationCar) : Result
+
+    broadcastFile(fileName : String) : Result
+    broadcastStop : Result
 }
 
 enum OperationCar {
@@ -341,8 +361,15 @@ enum OperationCar {
     stop
 }
 
+input CarStateInput {
+    TODO : Int
+}
 
-input  CarStateInput {
+type UavMutation {
+    reportState(uavState : UavStateInput) : Result
+}
+
+input UavStateInput {
     TODO : Int
 }
 
@@ -369,6 +396,8 @@ extend type Subscription {
     lightSustainedDetectionReportEvent(lightId: Int!) : [Detection!]!
 
     carStateReportEvent(carId : Int!) : CarState!
+
+    uavStateReportEvent(uavId : Int!) : UavState!
 }
 
 type UpdateConfigurationEvent {

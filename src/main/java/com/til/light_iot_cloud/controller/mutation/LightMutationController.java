@@ -88,12 +88,12 @@ public class LightMutationController {
 
 
     @SchemaMapping(typeName = "LightMutation")
-    public Result<Void> commandDown(Device light, @Argument LightCommandKey key , @Argument String value) {
+    public Result<Void> commandDown(Device light, @Argument LightCommandKey key, @Argument String value) {
         return deviceMutationController.commandDown(light, key.getValue(), value);
     }
 
     @SchemaMapping(typeName = "LightMutation")
-    public Result<Void> ptzControl(Device light , @Argument PtzControl ptzControl) {
+    public Result<Void> ptzControl(Device light, @Argument PtzControl ptzControl) {
         return commandDown(light, LightCommandKey.CAMERA_PTZ_CONTROL, ptzControl.toString());
     }
 
@@ -120,6 +120,16 @@ public class LightMutationController {
     @SchemaMapping(typeName = "LightMutation")
     public Result<Void> closeSustainedDetection(Device light) {
         return commandDown(light, LightCommandKey.DETECTION_SUSTAINED, "null");
+    }
+
+    @SchemaMapping(typeName = "LightMutation")
+    public Result<Void> broadcastFile(Device light, @Argument String fileName) {
+        return commandDown(light, LightCommandKey.BROADCAST_FILE, fileName);
+    }
+
+    @SchemaMapping(typeName = "LightMutation")
+    public Result<Void> broadcastStop(Device light) {
+        return commandDown(light, LightCommandKey.BROADCAST_STOP, "null");
     }
 
 }

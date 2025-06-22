@@ -9,10 +9,16 @@ import lombok.ToString;
 @AllArgsConstructor
 public enum LightCommandKey {
     CAMERA_PTZ_CONTROL("Camera.PtzControl"),
+
     DEVICE_GEAR("Device.Gear"),
     DEVICE_SWITCH("Device.Switch"),
     DEVICE_ROLLING_DOOR("Device.RollingDoor"),
-    DETECTION_SUSTAINED("Detection.Sustained");
+
+    DETECTION_SUSTAINED("Detection.Sustained"),
+
+    BROADCAST_FILE("Broadcast.File"),
+    BROADCAST_STOP("Broadcast.Stop");
+
 
     private final String value;
 }

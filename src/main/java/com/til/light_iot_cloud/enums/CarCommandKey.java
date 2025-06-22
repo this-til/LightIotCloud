@@ -8,7 +8,10 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public enum CarCommandKey {
-    OPERATION("Operation");
+    OPERATION("Operation"),
+
+    BROADCAST_FILE("Broadcast.File"),
+    BROADCAST_STOP("Broadcast.Stop");
 
     private final String value;
 

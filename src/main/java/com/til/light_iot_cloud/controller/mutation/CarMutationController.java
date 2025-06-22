@@ -6,6 +6,7 @@ import com.til.light_iot_cloud.context.DeviceContext;
 import com.til.light_iot_cloud.data.*;
 import com.til.light_iot_cloud.data.input.OperationCarInput;
 import com.til.light_iot_cloud.enums.CarCommandKey;
+import com.til.light_iot_cloud.enums.LightCommandKey;
 import com.til.light_iot_cloud.enums.OperationCar;
 import com.til.light_iot_cloud.event.CarStateReportEvent;
 import jakarta.annotation.Resource;
@@ -54,5 +55,14 @@ public class CarMutationController {
         return commandDown(car, CarCommandKey.OPERATION, operationCar.name());
     }
 
+    @SchemaMapping(typeName = "CarMutation")
+    public Result<Void> broadcastFile(Device car, @Argument String fileName) {
+        return commandDown(car, CarCommandKey.BROADCAST_FILE, fileName);
+    }
+
+    @SchemaMapping(typeName = "CarMutation")
+    public Result<Void> broadcastStop(Device car) {
+        return commandDown(car, CarCommandKey.BROADCAST_STOP, "null");
+    }
 
 }
