@@ -1,14 +1,16 @@
 package com.til.light_iot_cloud.data;
 
+import com.til.light_iot_cloud.enums.RollingDoorState;
 import lombok.Data;
 
 @Data
 public class LightState {
-    Float electricity;
-    Float voltage;
-    Float power;
+    PowerPack selfPower;
+    PowerPack wirelessChargingPower;
+    PowerPack uavPower;
+    PowerPack uavBaseStationPower;
 
-    Float wirelessChargingElectricity;
-    Float wirelessChargingVoltage;
-    Float wirelessChargingPower;
+    Boolean automaticGear;
+    Float gear;
+    RollingDoorState rollingDoorState;
 }

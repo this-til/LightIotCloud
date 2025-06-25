@@ -123,6 +123,20 @@ enum UserType {
     administrators, user, device
 }
 
+enum RollingDoorState {
+    # 开启的
+    OPENED
+
+    # 开启中
+    OPENING
+
+    # 关闭的
+    CLOSED
+
+    # 关闭中
+    CLOSING
+}
+
 type Light {
     # 离线时为 null
     lightState : LightState
@@ -148,14 +162,27 @@ type LightData {
     windDirection : Float
 }
 
-type LightState {
+type PowerPack {
     electricity : Float
     voltage : Float
     power : Float
+}
 
-    wirelessChargingElectricity : Float
-    wirelessChargingVoltage : Float
-    wirelessChargingPower : Float
+type LightState {
+    selfPower : PowerPack
+    wirelessChargingPower : PowerPack
+    uavPower: PowerPack
+    uavBaseStationPower: PowerPack
+
+    # 当前是不是知道调光
+    automaticGear : Boolean
+
+    # 当前的调光等级
+    gear : Float
+
+    # 卷帘门开启状态
+    rollingDoorState : RollingDoorState
+
 }
 
 type DetectionKeyframe {
@@ -268,6 +295,9 @@ enum LightCommandKey {
 
     BROADCAST_FILE
     BROADCAST_STOP
+
+    UAV_BASE_STATION_COVER
+
 }
 
 type LightMutation {
@@ -293,6 +323,8 @@ type LightMutation {
 
     broadcastFile(fileName : String) : Result
     broadcastStop : Result
+
+    setUavBaseStationCover(open : Boolean) : Result
 }
 
 # noinspection GraphQLUnresolvedReference,GraphQLMissingType
@@ -311,14 +343,22 @@ input DetectionItemInput {
     probability : Float!
 }
 
-input LightStateInput {
+input PowerPackInput  {
     electricity : Float
     voltage : Float
     power : Float
+}
 
-    wirelessChargingElectricity : Float
-    wirelessChargingVoltage : Float
-    wirelessChargingPower : Float
+
+input LightStateInput {
+    selfPower : PowerPackInput
+    wirelessChargingPower : PowerPackInput
+    uavPower : PowerPackInput
+    uavBaseStationPower : PowerPackInput
+
+    automaticGear : Boolean
+    gear : Float
+    rollingDoorState : RollingDoorState
 }
 
 input LightDataInput  {

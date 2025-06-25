@@ -17,7 +17,10 @@ public enum LightCommandKey {
     DETECTION_SUSTAINED("Detection.Sustained"),
 
     BROADCAST_FILE("Broadcast.File"),
-    BROADCAST_STOP("Broadcast.Stop");
+    BROADCAST_STOP("Broadcast.Stop"),
+
+    UAV_BASE_STATION_COVER("UavBaseStation.Cover"),
+    ;
 
 
     private final String value;
