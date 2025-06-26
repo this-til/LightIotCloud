@@ -20,6 +20,7 @@ public enum LightCommandKey {
     BROADCAST_STOP("Broadcast.Stop"),
 
     UAV_BASE_STATION_COVER("UavBaseStation.Cover"),
+    UAV_BASE_STATION_CLAMP("UavBaseStation.Clamp"),
     ;
 
 

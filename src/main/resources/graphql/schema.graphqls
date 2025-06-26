@@ -297,6 +297,7 @@ enum LightCommandKey {
     BROADCAST_STOP
 
     UAV_BASE_STATION_COVER
+    UAV_BASE_STATION_CLAMP
 
 }
 
@@ -325,6 +326,7 @@ type LightMutation {
     broadcastStop : Result
 
     setUavBaseStationCover(open : Boolean) : Result
+    setUavBaseStationClamp(open: Boolean) : Result
 }
 
 # noinspection GraphQLUnresolvedReference,GraphQLMissingType

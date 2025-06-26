@@ -137,4 +137,8 @@ public class LightMutationController {
         return commandDown(light, LightCommandKey.UAV_BASE_STATION_COVER, open.toString());
     }
 
+    @SchemaMapping(typeName = "LightMutation")
+    public Result<Void> setUavBaseStationClamp(Device light, @Argument Boolean open) {
+        return commandDown(light, LightCommandKey.UAV_BASE_STATION_CLAMP, open.toString());
+    }
 }
