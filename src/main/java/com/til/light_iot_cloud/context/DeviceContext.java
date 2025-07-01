@@ -34,6 +34,9 @@ public abstract class DeviceContext {
     public static class LightContext extends DeviceContext {
         LightState lightState = new LightState();
 
+        boolean allowedDispatched;
+
+
         public LightContext(Device device) {
             super(device);
         }

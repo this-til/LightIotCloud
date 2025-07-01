@@ -266,6 +266,10 @@ type Mutation {
     self : UserMutation!
     deviceSelf : DeviceMutation!
 
+    dispatch : Result!
+    interrupt : Result!
+    endDispatch : Result!
+
 }
 
 type UserMutation {
@@ -299,6 +303,8 @@ enum LightCommandKey {
     UAV_BASE_STATION_COVER
     UAV_BASE_STATION_CLAMP
 
+    DISPATCH
+
 }
 
 type LightMutation {
@@ -327,6 +333,9 @@ type LightMutation {
 
     setUavBaseStationCover(open : Boolean) : Result
     setUavBaseStationClamp(open: Boolean) : Result
+
+    setAllowedDispatched(activation : Boolean) : Result
+
 }
 
 # noinspection GraphQLUnresolvedReference,GraphQLMissingType
@@ -378,12 +387,13 @@ enum CarCommandKey {
 
     BROADCAST_FILE
     BROADCAST_STOP
+
+    DISPATCH
 }
 
 type CarMutation {
 
     commandDown(key : CarCommandKey, value : String) : Result
-
 
     reportState(carState : CarStateInput) : Result
 

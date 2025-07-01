@@ -141,4 +141,22 @@ public class LightMutationController {
     public Result<Void> setUavBaseStationClamp(Device light, @Argument Boolean open) {
         return commandDown(light, LightCommandKey.UAV_BASE_STATION_CLAMP, open.toString());
     }
+
+    @SchemaMapping(typeName = "LightMutation")
+    public Result<Void> setAllowedDispatched(Device light, @Argument Boolean activation) {
+        DeviceContext deviceContext = deviceRunManager.getDeviceContext(light.getId());
+
+        if (deviceContext == null) {
+            throw new IllegalArgumentException("No device context found for light: " + light.getId());
+        }
+
+        if (!(deviceContext instanceof DeviceContext.LightContext lightContext)) {
+            throw new IllegalArgumentException("device context is not a LightContext");
+        }
+
+        lightContext.setAllowedDispatched(activation);
+        return Result.successful();
+    }
+
+
 }

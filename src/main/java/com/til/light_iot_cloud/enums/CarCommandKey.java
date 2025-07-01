@@ -11,7 +11,11 @@ public enum CarCommandKey {
     OPERATION("Operation"),
 
     BROADCAST_FILE("Broadcast.File"),
-    BROADCAST_STOP("Broadcast.Stop");
+    BROADCAST_STOP("Broadcast.Stop"),
+
+    DISPATCH("Dispatch"),
+    INTERRUPT("Interrupt"),
+    END_DISPATCH("End.Dispatch");
 
     private final String value;
 

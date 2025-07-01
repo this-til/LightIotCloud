@@ -25,6 +25,7 @@ public class DeviceRunManager {
     @Resource
     private DeviceService deviceService;
 
+    @Getter
     private final Map<Long, DeviceContext> deviceContextMap = new ConcurrentHashMap<>();
 
     @PostConstruct

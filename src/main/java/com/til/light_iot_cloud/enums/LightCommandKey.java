@@ -21,8 +21,12 @@ public enum LightCommandKey {
 
     UAV_BASE_STATION_COVER("UavBaseStation.Cover"),
     UAV_BASE_STATION_CLAMP("UavBaseStation.Clamp"),
-    ;
 
+    DISPATCH("Dispatch"),
+    INTERRUPT("Interrupt"),
+    END_DISPATCH("End.Dispatch")
+
+    ;
 
     private final String value;
 }
