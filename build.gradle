@@ -1,8 +1,11 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.7-SNAPSHOT'
+    id 'org.springframework.boot' version '3.4.7'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.netflix.dgs.codegen' version '7.0.3'
+}
+ext {
+    springAiVersion = "1.0.0"
 }
 
 group = 'com.til.light_iot_cloud'
@@ -52,6 +55,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    implementation 'org.springframework.ai:spring-ai-starter-mcp-server'
+    implementation 'org.springframework.ai:spring-ai-starter-mcp-server-webmvc'
+    //implementation 'org.springframework.ai:spring-ai-starter-mcp-server-webflux'
+
+
     implementation 'name.nkonev.multipart-spring-graphql:multipart-spring-graphql:1.6.0'
 
     compileOnly 'org.jetbrains:annotations:24.0.0'
@@ -59,7 +68,7 @@ dependencies {
     //implementation 'net.bytebuddy:byte-buddy-agent:1.17.5'
     //implementation 'net.bytebuddy:byte-buddy:1.17.5'
     //implementation 'com.graphql-java-kickstart:graphql-spring-boot-starter:12.0.0'
-    implementation 'org.apache.ftpserver:ftpserver-core:1.2.0'
+    //implementation 'org.apache.ftpserver:ftpserver-core:1.2.0'
     implementation 'com.graphql-java:graphql-java-extended-scalars:22.0'
     implementation 'io.netty:netty-all:4.1.109.Final'
     implementation "com.auth0:java-jwt:4.4.0"
@@ -75,6 +84,11 @@ generateJava {
     schemaPaths = ["${projectDir}/src/main/resources/graphql-client"]
     packageName = 'com.til.light_iot_cloud.lightiotcloud.codegen'
     generateClient = true
+}
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.ai:spring-ai-bom:$springAiVersion"
+    }
 }
 
 tasks.named('test') {

@@ -12,6 +12,7 @@ import org.springframework.web.socket.WebSocketSession;
 @Data
 @NoArgsConstructor
 public class AuthContext {
+
     LinkType linkType;
 
     User user;

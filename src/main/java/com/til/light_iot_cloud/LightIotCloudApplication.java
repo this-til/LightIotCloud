@@ -13,7 +13,6 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 public class LightIotCloudApplication {
 
     public static void main(String[] args) {
-        //GraphQLWebSocketInjector.install();
         SpringApplication.run(LightIotCloudApplication.class, args);
     }
 

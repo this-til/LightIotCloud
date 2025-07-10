@@ -2,6 +2,9 @@ spring:
   application:
     name: LightIotCloud
 
+  main:
+    banner-mode: off
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/light_iot_cloud
@@ -9,6 +12,9 @@ spring:
     password: 20041119LYS&lys
 
   graphql:
+    schema:
+      printer:
+        enabled: true
     graphiql:
       enabled: true
     websocket:
@@ -23,6 +29,22 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 20MB
+
+
+  ai:
+    mcp:
+      server:
+        enabled: true
+        name: LightIotCloud-Server
+        version: 1.0.0
+        type: ASYNC
+        sse-message-endpoint: /mcp/message
+        capabilities:
+          tool: true
+          resource: true
+          prompt: true
+          completion: true
+
 
 mybatis-plus:
   configuration:
@@ -39,6 +61,8 @@ cors:
 logging:
   level:
     org.mybatis: DEBUG
+  pattern:
+    console:
 
 server:
   servlet:
@@ -50,10 +74,13 @@ server:
 jwt:
   secret: ~secret~
   expiration: 86400000 # 24小时
+  wirelessTime : true
 
 image:
   storage-path: "/uploads/"
   thumbnail:
     width: 0.2
     height: 0.2
+
+
 
