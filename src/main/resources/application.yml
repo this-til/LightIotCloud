@@ -34,8 +34,8 @@ spring:
   ai:
     mcp:
       server:
-        enabled: true
-        name: LightIotCloud-Server
+        enabled: false
+        name: LightIotCloud-GraphQL-Server
         version: 1.0.0
         type: ASYNC
         sse-message-endpoint: /mcp/message
@@ -74,7 +74,7 @@ server:
 jwt:
   secret: ~secret~
   expiration: 86400000 # 24小时
-  wirelessTime : true
+  wirelessTime : false
 
 image:
   storage-path: "/uploads/"

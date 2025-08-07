@@ -24,8 +24,9 @@ public enum LightCommandKey {
 
     DISPATCH("Dispatch"),
     INTERRUPT("Interrupt"),
-    END_DISPATCH("End.Dispatch")
+    END_DISPATCH("End.Dispatch"),
 
+    CLOSE_ALARM_DIALOGUE("Close.Alarm.Dialogue")
     ;
 
     private final String value;

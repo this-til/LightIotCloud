@@ -93,6 +93,12 @@ enum PtzControl {
     PAN_RIGHT
 }
 
+enum AlarmDialogueOperateType {
+    REQUEST,
+    OPEN,
+    CLOSE
+}
+
 # 图像矩阵数据包
 type MatPack {
     # 图像宽度
@@ -117,6 +123,7 @@ input MatInput {
     image : Bytes
 }
 
+
 # -----------------------通用类型-----------------------
 
 # -----------------------查询类型-----------------------
@@ -125,7 +132,7 @@ input MatInput {
 type Query {
     # 获取当前用户信息
     self : User!
-    
+
     # 获取当前设备信息（仅设备登录时可用）
     deviceSelf : Device
 }
@@ -144,11 +151,12 @@ type Device {
     updatedAt : DateTime!
     # 设备类型
     deviceType : DeviceType!
-    
+
     # 是否在线
     online : Boolean
-    
-    # 设备类型转换器
+
+    # -----------------------设备类型转换器-----------------------
+
     # 转换为车辆类型
     asCar: Car
     # 转换为路灯类型
@@ -171,16 +179,16 @@ type User {
     phone : String
     # 邮箱
     email : String
-    
+
     # 用户关联的检测模型
     model: [DetectionModel]
-    
-    # 获取用户设备列表
+
+    # 获取用户设备列表，deviceType为null时表示没有设备类型限制
     devices(deviceType : DeviceType) : [Device!]!
-    
+
     # 根据名称获取设备
     getDeviceByName(name: String ,deviceType : DeviceType ) : Device
-    
+
     # 根据ID获取设备
     getDeviceById(id : ID , deviceType : DeviceType) : Device
 }
@@ -199,13 +207,13 @@ enum UserType {
 enum RollingDoorState {
     # 完全开启
     OPENED
-    
+
     # 正在开启
     OPENING
-    
+
     # 完全关闭
     CLOSED
-    
+
     # 正在关闭
     CLOSING
 }
@@ -214,13 +222,13 @@ enum RollingDoorState {
 type Light {
     # 路灯当前状态（离线时为null）
     lightState : LightState
-    
+
     # 获取环境数据历史记录
     datas(timeRange : TimeRange) : [LightData!]!
-    
+
     # 获取检测关键帧历史记录
     detectionKeyframes(page : Page, timeRange : TimeRange) : [DetectionKeyframe!]!
-    
+
     # 获取检测关键帧数量
     detectionKeyframeCount(timeRange : TimeRange) : Int
 }
@@ -233,7 +241,7 @@ type LightData {
     lightId : ID!
     # 数据时间
     time : DateTime!
-    
+
     # 湿度（%）
     humidity : Float
     # 温度（℃）
@@ -270,13 +278,13 @@ type LightState {
     uavPower: PowerPack
     # 无人机基站电源
     uavBaseStationPower: PowerPack
-    
+
     # 是否开启自动调光
     automaticGear : Boolean
-    
+
     # 当前亮度等级（0-100）
     gear : Float
-    
+
     # 卷帘门开启状态
     rollingDoorState : RollingDoorState
 }
@@ -289,7 +297,7 @@ type DetectionKeyframe {
     deviceId : ID!
     # 检测时间
     time : DateTime!
-    
+
     # 该帧中的所有检测结果
     detections : [Detection!]!
 }
@@ -307,7 +315,7 @@ type Detection {
     h : Float!
     # 检测置信度（0-1）
     probability : Float!
-    
+
     # 使用的检测模型
     model : String
     # 检测到的物体类别
@@ -375,37 +383,37 @@ type UavState {
 type Mutation {
     # 用户登录（无需JWT验证）
     login (username : String!, password :String!) : String!
-    
+
     # 用户注册（无需JWT验证）
     register (username : String! , password :String!) : Boolean
-    
+
     # 验证JWT令牌是否有效
     jwtEffective(jwt : String) : Boolean!
-    
+
     # 获取当前用户的变更操作
     self : UserMutation!
-    
+
     # 获取当前设备的变更操作
     deviceSelf : DeviceMutation!
-    
+
     # 调度操作
     dispatch : Result!
-    
+
     # 中断操作
     interrupt : Result!
-    
+
     # 结束调度
     endDispatch : Result!
 }
 
 # 用户变更操作
 type UserMutation {
-    # 获取用户设备的变更操作
+    # 获取用户设备的变更操作，deviceType为null时表示没有设备类型限制
     devices(deviceType : DeviceType) : [DeviceMutation!]!
-    
+
     # 根据名称获取设备变更操作
     getDeviceByName(name: String ,deviceType : DeviceType ) : DeviceMutation
-    
+
     # 根据ID获取设备变更操作
     getDeviceById(id : ID , deviceType : DeviceType) : DeviceMutation
 }
@@ -414,16 +422,16 @@ type UserMutation {
 type DeviceMutation {
     # 设置设备配置
     setConfiguration(key : String, value : String) : Result
-    
+
     # 下发设备命令
     commandDown(key : String, value : String) : Result
-    
+
     # 上报检测结果
     reportDetection(detectionInput : DetectionInput) : Result
-    
+
     # 上报持续检测结果
     sustainedReportDetection(items : [DetectionItemInput]) : Result
-    
+
     # 设备类型转换器
     # 转换为路灯变更操作
     asLight : LightMutation!
@@ -443,64 +451,74 @@ enum LightCommandKey {
     DEVICE_ROLLING_DOOR
     # 持续检测
     DETECTION_SUSTAINED
-    
+
     # 广播文件
     BROADCAST_FILE
     # 停止广播
     BROADCAST_STOP
-    
+
     # 无人机基站舱盖
     UAV_BASE_STATION_COVER
     # 无人机基站夹具
     UAV_BASE_STATION_CLAMP
-    
+
     # 调度
     DISPATCH
+    END_DISPATCH
+
+    # 关闭对话
+    CLOSE_ALARM_DIALOGUE
 }
 
 # 路灯变更操作
 type LightMutation {
     # 上报环境数据更新
     reportUpdate(lightDataInput : LightDataInput) : Result
-    
+
     # 上报路灯状态
     reportState(lightState : LightStateInput) : Result
-    
+
     # 下发路灯命令
     commandDown(key : LightCommandKey, value : String) : Result
-    
+
     # 云台控制
     ptzControl(ptzControl : PtzControl) : Result
-    
+
     # 设置亮度档位（0-100）
     setGear(value : Int!) : Result
-    
+
     # 设置自动亮度调节
     setAutomaticGear(value : Boolean!) : Result
-    
+
     # 设置卷帘门开闭状态（true：开启）
     setRollingDoor(open : Boolean!) : Result
-    
+
     # 设置持续检测模型
     setSustainedDetection(modelName : String) : Result
-    
+
     # 关闭持续检测
     closeSustainedDetection : Result
-    
+
     # 广播文件
     broadcastFile(fileName : String) : Result
-    
+
     # 停止广播
     broadcastStop : Result
-    
+
     # 设置无人机基站舱盖
     setUavBaseStationCover(open : Boolean) : Result
-    
+
     # 设置无人机基站夹具
     setUavBaseStationClamp(open: Boolean) : Result
-    
+
     # 设置是否允许调度
     setAllowedDispatched(activation : Boolean) : Result
+
+    # 请求开启报警对话
+    requestAlarmDialogue : Result
+
+    # 关闭报警对话 前端/设备均可调用以关闭对话
+    closeAlarmDialogue : Result
 }
 
 # 检测输入数据
@@ -549,7 +567,7 @@ input LightStateInput {
     uavPower : PowerPackInput
     # 无人机基站电源
     uavBaseStationPower : PowerPackInput
-    
+
     # 自动调光开关
     automaticGear : Boolean
     # 亮度档位
@@ -580,12 +598,12 @@ input LightDataInput  {
 enum CarCommandKey {
     # 操作命令
     OPERATION
-    
+
     # 广播文件
     BROADCAST_FILE
     # 停止广播
     BROADCAST_STOP
-    
+
     # 调度
     DISPATCH
 }
@@ -594,16 +612,16 @@ enum CarCommandKey {
 type CarMutation {
     # 下发车辆命令
     commandDown(key : CarCommandKey, value : String) : Result
-    
+
     # 上报车辆状态
     reportState(carState : CarStateInput) : Result
-    
+
     # 车辆操作控制
     operationCar(operationCar : OperationCar) : Result
-    
+
     # 广播文件
     broadcastFile(fileName : String) : Result
-    
+
     # 停止广播
     broadcastStop : Result
 }
@@ -650,37 +668,39 @@ input UavStateInput {
 type Subscription {
     # 配置更新事件
     updateConfigurationEvent : UpdateConfigurationEvent
-    
+
     # 命令下发事件
     commandDownEvent : CommandDownEvent
-}
 
-# Web端扩展订阅类型
-extend type Subscription {
+    # -----------------------web-----------------------
     # 测试订阅
     testSubscription : Int!
-    
+
     # 设备在线状态切换事件
     deviceOnlineStateSwitchEvent : DeviceOnlineStateSwitchEvent!
-    
+
     # 路灯状态上报事件
     lightStateReportEvent(lightId : Int!) : LightState!
-    
+
     # 路灯环境数据上报事件
     lightDataReportEvent(lightId : Int!) : LightData!
-    
+
     # 路灯检测结果上报事件
     lightDetectionReportEvent(lightId: Int!) : DetectionKeyframe!
-    
+
     # 路灯持续检测结果上报事件
     lightSustainedDetectionReportEvent(lightId: Int!) : [Detection!]!
-    
+
+    # 报警对话事件
+    alarmDialogueOperateEvent: AlarmDialogueOperateEvent
+
     # 车辆状态上报事件
     carStateReportEvent(carId : Int!) : CarState!
-    
+
     # 无人机状态上报事件
     uavStateReportEvent(uavId : Int!) : UavState!
 }
+
 
 # 配置更新事件
 type UpdateConfigurationEvent {
@@ -704,6 +724,11 @@ type DeviceOnlineStateSwitchEvent {
     onlineState : OnlineState!
     # 设备信息
     device: Device!
+}
+
+type AlarmDialogueOperateEvent {
+    light : Device
+    alarmDialogueOperateType: AlarmDialogueOperateType
 }
 
 # -----------------------订阅类型-----------------------
