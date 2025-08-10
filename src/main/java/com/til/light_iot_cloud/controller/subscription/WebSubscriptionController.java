@@ -19,11 +19,11 @@ import java.util.List;
 
 /**
  * WebSocket 订阅控制器
- * 
+ * <p>
  * 本控制器提供基于 GraphQL WebSocket 的实时数据订阅功能，
  * 支持设备状态、数据采集、检测结果等多种实时事件的推送。
  * 所有订阅方法都要求客户端使用 WebSocket 连接，并具备相应的设备访问权限。
- * 
+ * <p>
  * 主要功能：
  * - 设备在线状态变化推送
  * - 灯光设备实时状态和数据推送  
@@ -45,7 +45,7 @@ public class WebSubscriptionController {
 
     /**
      * 测试订阅接口
-     * 
+     * <p>
      * 用于测试 WebSocket 连接和订阅功能是否正常工作。
      * 每隔1秒推送一个递增的数字。
      * 
@@ -58,7 +58,7 @@ public class WebSubscriptionController {
 
     /**
      * 设备在线状态切换事件订阅
-     * 
+     * <p>
      * 订阅全局设备在线状态变化事件，当任何设备的在线状态发生变化时，
      * 都会向订阅者推送相应的状态切换事件。
      * 
@@ -76,7 +76,7 @@ public class WebSubscriptionController {
 
     /**
      * 灯光状态报告事件订阅
-     * 
+     * <p>
      * 订阅指定灯光设备的实时状态数据，包括开关状态、亮度、颜色等信息。
      * 只有设备的所有者才能订阅该设备的状态数据。
      * 
@@ -106,7 +106,7 @@ public class WebSubscriptionController {
 
     /**
      * 灯光数据报告事件订阅
-     * 
+     * <p>
      * 订阅指定灯光设备的实时数据采集信息，包括环境监测数据、传感器读数等。
      * 只有设备的所有者才能订阅该设备的数据。
      * 
@@ -137,7 +137,7 @@ public class WebSubscriptionController {
 
     /**
      * 灯光检测报告事件订阅
-     * 
+     * <p>
      * 订阅指定灯光设备的实时检测结果，包括物体识别、异常检测等关键帧数据。
      * 只有设备的所有者才能订阅该设备的检测数据。
      * 
@@ -168,7 +168,7 @@ public class WebSubscriptionController {
 
     /**
      * 灯光持续检测报告事件订阅
-     * 
+     * <p>
      * 订阅指定灯光设备的持续检测结果，返回连续的检测项目列表。
      * 适用于需要持续监控和分析的场景。
      * 只有设备的所有者才能订阅该设备的持续检测数据。
@@ -199,7 +199,7 @@ public class WebSubscriptionController {
 
     /**
      * 报警对话操作事件订阅
-     * 
+     * <p>
      * 订阅全局报警对话操作事件，包括报警的确认、处理、忽略等操作。
      * 所有具有 WebSocket 连接的用户都可以接收到这些事件。
      * 
@@ -220,7 +220,7 @@ public class WebSubscriptionController {
 
     /**
      * 车辆状态报告事件订阅
-     * 
+     * <p>
      * 订阅指定车辆设备的实时状态数据，包括位置、速度、方向、电池状态等信息。
      * 只有设备的所有者才能订阅该设备的状态数据。
      * 
@@ -249,7 +249,7 @@ public class WebSubscriptionController {
 
     /**
      * 无人机状态报告事件订阅
-     * 
+     * <p>
      * 订阅指定无人机设备的实时状态数据，包括位置、姿态、飞行状态、电池状态等信息。
      * 只有设备的所有者才能订阅该设备的状态数据。
      * 
@@ -273,7 +273,7 @@ public class WebSubscriptionController {
 
         return sinkEventHolder.getSinks(UavStateReportEvent.class)
                 .asFlux()
-                .filter(e -> e.getDevice().equals(uavId))
+                .filter(e -> e.getDevice().getId().equals(uavId))
                 .map(UavStateReportEvent::getUavState);
     }
 }

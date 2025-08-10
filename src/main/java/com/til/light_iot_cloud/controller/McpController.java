@@ -28,17 +28,17 @@ import java.util.Map;
 
 /**
  * MCP (Model Context Protocol) 控制器
- * 
+ * <p>
  * 本控制器为 AI 模型提供访问 GraphQL API 的能力，通过 Spring AI 的工具注解
  * 将 GraphQL 查询和变更操作暴露为 AI 工具函数。支持获取 GraphQL schema
  * 文档和执行 GraphQL 查询语句。
- * 
+ * <p>
  * 主要功能：
  * - 提供 GraphQL schema 文档查询
  * - 执行 GraphQL 查询和变更操作
  * - 支持带 JWT 令牌的身份验证
  * - 为 AI 模型提供结构化的 API 访问能力
- * 
+ * <p>
  * 使用场景：
  * - AI 助手通过自然语言与系统交互
  * - 自动化数据查询和操作
@@ -62,7 +62,7 @@ public class McpController {
 
     /**
      * 获取 GraphQL Schema 文档
-     * 
+     * <p>
      * 返回当前系统的 GraphQL schema 描述文档，包含所有可用的查询、变更和订阅操作，
      * 以及相关的数据类型定义。AI 模型可以通过此文档了解 API 的完整结构。
      * 
@@ -75,11 +75,11 @@ public class McpController {
 
     /**
      * 执行 GraphQL 查询
-     * 
+     * <p>
      * 执行标准的 GraphQL 查询或变更操作，支持变量传递和身份验证。
      * 如果提供了有效的 JWT 令牌，查询将在相应用户的权限上下文中执行；
      * 否则将以匿名用户身份执行，只能访问公开的操作（如登录）。
-     * 
+     * <p>
      * 注意：建议在使用此方法前先调用 getSchema() 获取 API 文档。
      * 
      * @param query GraphQL 标准查询语句，支持 Query 和 Mutation 操作
@@ -124,4 +124,5 @@ public class McpController {
 
         return graphQlSource.graphQl().execute(builder.build());
     }
+
 }

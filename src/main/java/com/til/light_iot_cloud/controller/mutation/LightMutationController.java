@@ -18,11 +18,11 @@ import org.springframework.stereotype.Controller;
 
 /**
  * 灯光设备变更控制器
- * 
+ * <p>
  * 提供灯光设备的全面控制和数据管理功能，作为 GraphQL LightMutation 类型的实现。
  * 支持设备状态上报、命令下发、设备控制、检测管理等多种操作，
  * 是灯光设备与系统交互的核心控制器。
- * 
+ * <p>
  * 主要功能模块：
  * - 数据上报：灯光数据、状态信息上报
  * - 设备控制：PTZ控制、档位设置、自动模式切换
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Controller;
  * - 检测管理：持续检测启停、报警对话管理
  * - 音频广播：文件播放、广播控制
  * - 调度管理：设备调度权限设置
- * 
+ * <p>
  * 设备验证：
  * - 验证设备上下文的有效性
  * - 确保操作的设备类型正确
@@ -72,7 +72,7 @@ public class LightMutationController {
 
     /**
      * 上报灯光数据
-     * 
+     * <p>
      * 接收并处理灯光设备上报的传感器数据，包括环境监测数据、设备状态等。
      * 数据将被持久化存储并通过事件机制实时推送给订阅者。
      * 
@@ -105,7 +105,7 @@ public class LightMutationController {
 
     /**
      * 上报灯光状态
-     * 
+     * <p>
      * 接收并处理灯光设备的状态信息，包括开关状态、亮度、工作模式等。
      * 状态信息会被更新到设备上下文中，并实时推送给订阅者。
      * 
@@ -135,7 +135,7 @@ public class LightMutationController {
 
     /**
      * 发送设备命令
-     * 
+     * <p>
      * 向灯光设备下发控制命令，支持各种设备操作和配置。
      * 命令通过设备连接管理器发送到目标设备。
      * 
@@ -151,7 +151,7 @@ public class LightMutationController {
 
     /**
      * PTZ 云台控制
-     * 
+     * <p>
      * 控制灯光设备上的摄像头云台，支持上下左右旋转、变焦等操作。
      * 
      * @param light 目标灯光设备
@@ -165,7 +165,7 @@ public class LightMutationController {
 
     /**
      * 设置设备档位
-     * 
+     * <p>
      * 调整灯光设备的工作档位，控制设备的功率和亮度等级。
      * 
      * @param light 目标灯光设备
@@ -179,7 +179,7 @@ public class LightMutationController {
 
     /**
      * 设置自动档位模式
-     * 
+     * <p>
      * 启用或禁用设备的自动档位调节功能，
      * 启用时设备会根据环境条件自动调整工作档位。
      * 
@@ -194,7 +194,7 @@ public class LightMutationController {
 
     /**
      * 控制卷帘门
-     * 
+     * <p>
      * 控制灯光设备上的卷帘门开关，用于设备保护或环境调节。
      * 
      * @param light 目标灯光设备
@@ -208,7 +208,7 @@ public class LightMutationController {
 
     /**
      * 启动持续检测
-     * 
+     * <p>
      * 使用指定的检测模型启动设备的持续检测功能，
      * 设备将持续进行图像识别和分析。
      * 
@@ -223,7 +223,7 @@ public class LightMutationController {
 
     /**
      * 停止持续检测
-     * 
+     * <p>
      * 停止设备当前的持续检测功能，设备将停止图像分析。
      * 
      * @param light 目标灯光设备
@@ -236,7 +236,7 @@ public class LightMutationController {
 
     /**
      * 播放广播文件
-     * 
+     * <p>
      * 控制设备播放指定的音频文件，用于语音广播或提示。
      * 
      * @param light 目标灯光设备
@@ -250,7 +250,7 @@ public class LightMutationController {
 
     /**
      * 停止广播播放
-     * 
+     * <p>
      * 停止设备当前正在播放的音频广播。
      * 
      * @param light 目标灯光设备
@@ -263,7 +263,7 @@ public class LightMutationController {
 
     /**
      * 控制无人机基站舱盖
-     * 
+     * <p>
      * 控制集成在灯光设备上的无人机基站舱盖开关，
      * 用于无人机的起飞和降落。
      * 
@@ -278,7 +278,7 @@ public class LightMutationController {
 
     /**
      * 控制无人机基站夹具
-     * 
+     * <p>
      * 控制集成在灯光设备上的无人机基站夹具，
      * 用于固定或释放无人机。
      * 
@@ -293,7 +293,7 @@ public class LightMutationController {
 
     /**
      * 设置调度许可状态
-     * 
+     * <p>
      * 设置设备是否允许被调度系统调度。
      * 禁用时，设备将不会响应全局调度命令。
      * 
@@ -320,7 +320,7 @@ public class LightMutationController {
 
     /**
      * 请求报警对话
-     * 
+     * <p>
      * 当设备检测到异常情况时，请求启动报警对话流程。
      * 系统将发送报警对话请求事件给相关订阅者。
      * 
@@ -347,7 +347,7 @@ public class LightMutationController {
 
     /**
      * 关闭报警对话
-     * 
+     * <p>
      * 结束当前的报警对话流程，设备将停止报警状态。
      * 同时发送对话关闭事件和设备关闭命令。
      * 

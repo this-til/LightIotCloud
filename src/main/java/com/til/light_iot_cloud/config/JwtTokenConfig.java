@@ -33,6 +33,7 @@ public class JwtTokenConfig {
     public String generateJwt(User user) {
         JWTCreator.Builder builder = JWT.create();
         builder.withClaim("id", user.getId());
+        builder.withClaim("username", user.getUsername());
         if (!wirelessTime) {
             builder.withExpiresAt(new Date(System.currentTimeMillis() + expiration));
         }
@@ -45,6 +46,28 @@ public class JwtTokenConfig {
                 .verify(token);
 
         return jwt.getClaim("id").asLong();
+    }
+
+    public boolean validateJwt(String token) {
+        try {
+            JWT.require(algorithm)
+                    .build()
+                    .verify(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String getUsernameFromToken(String token) {
+        try {
+            DecodedJWT jwt = JWT.require(algorithm)
+                    .build()
+                    .verify(token);
+            return jwt.getClaim("username").asString();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }

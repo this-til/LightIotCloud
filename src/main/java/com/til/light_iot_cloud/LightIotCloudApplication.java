@@ -16,4 +16,5 @@ public class LightIotCloudApplication {
         SpringApplication.run(LightIotCloudApplication.class, args);
     }
 
+
 }

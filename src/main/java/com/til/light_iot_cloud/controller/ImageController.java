@@ -3,6 +3,7 @@ package com.til.light_iot_cloud.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.data.DetectionKeyframe;
+import com.til.light_iot_cloud.data.LightState;
 import com.til.light_iot_cloud.service.DetectionKeyframeService;
 import com.til.light_iot_cloud.service.ImageStorageService;
 import jakarta.annotation.Resource;
@@ -15,18 +16,20 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 /**
  * 图像资源控制器
- * 
+ * <p>
  * 负责处理图像资源的访问和下载，包括检测关键帧图像的原图和缩略图。
  * 所有图像访问都需要通过身份验证，确保用户只能访问属于自己的图像资源。
- * 
+ * <p>
  * 主要功能：
  * - 提供检测关键帧图像的安全访问
  * - 支持原图和缩略图两种格式
  * - 实现基于用户权限的图像访问控制
  * - 返回标准的 HTTP 图像响应
- * 
+ * <p>
  * 安全机制：
  * - 验证图像所有权，防止越权访问
  * - 支持身份认证上下文
@@ -46,10 +49,10 @@ public class ImageController {
 
     /**
      * 加载图像资源
-     * 
+     * <p>
      * 根据检测关键帧ID加载对应的图像文件，支持原图和缩略图两种格式。
      * 在返回图像前会验证当前用户是否有权限访问该图像，确保数据安全。
-     * 
+     * <p>
      * 访问控制：
      * - 验证图像关键帧是否存在
      * - 检查图像是否属于当前认证用户

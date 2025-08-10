@@ -123,6 +123,32 @@ input MatInput {
     image : Bytes
 }
 
+type V3 {
+    x: Float
+    y: Float
+    z: Float
+}
+
+input V3Input {
+    x: Float
+    y: Float
+    z: Float
+}
+
+type Quaternion {
+    x: Float
+    y: Float
+    z: Float
+    w: Float
+}
+
+
+input QuaternionInput {
+    x: Float
+    y: Float
+    z: Float
+    w: Float
+}
 
 # -----------------------通用类型-----------------------
 
@@ -370,9 +396,17 @@ type Uav {
     uavState : UavState               # 无人机状态
 }
 
-# 无人机状态（待实现）
 type UavState {
-    TODO : Int
+
+    acceleratedSpeed : V3
+    angularVelocity : V3
+    angle : V3
+    quaternion : Quaternion
+
+    # 气压
+    airPressure : Float
+    # 海拔
+    elevation : Float
 }
 
 # -----------------------查询类型-----------------------
@@ -655,9 +689,17 @@ type UavMutation {
     reportState(uavState : UavStateInput) : Result
 }
 
-# 无人机状态输入（待实现）
+# 无人机状态输入
 input UavStateInput {
-    TODO : Int
+    acceleratedSpeed : V3Input
+    angularVelocity : V3Input
+    angle : V3Input
+    quaternion : QuaternionInput
+
+    # 气压
+    airPressure : Float
+    # 海拔
+    elevation : Float
 }
 
 # -----------------------变更类型-----------------------
