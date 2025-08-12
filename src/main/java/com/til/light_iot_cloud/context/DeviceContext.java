@@ -24,6 +24,9 @@ public abstract class DeviceContext {
             case LIGHT -> {
                 return new LightContext(device);
             }
+            case UAV -> {
+                return new UavContext(device);
+            }
             default -> throw new IllegalArgumentException("Device type not supported: " + device.getDeviceType());
         }
     }

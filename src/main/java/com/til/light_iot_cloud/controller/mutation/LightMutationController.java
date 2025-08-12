@@ -354,7 +354,7 @@ public class LightMutationController {
     @SchemaMapping(typeName = "LightMutation")
     public Result<Void> openAlarmDialogue(Device light) {
         sinkEventHolder.publishEvent(new AlarmDialogueOperateEvent(light, AlarmDialogueOperateType.OPEN));
-        return commandDown(light, LightCommandKey.CLOSE_ALARM_DIALOGUE, "null");
+        return commandDown(light, LightCommandKey.OPEN_ALARM_DIALOGUE, "null");
     }
 
     /**
