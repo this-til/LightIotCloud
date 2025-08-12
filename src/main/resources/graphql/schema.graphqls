@@ -551,6 +551,9 @@ type LightMutation {
     # 请求开启报警对话
     requestAlarmDialogue : Result
 
+    # 打开对话请求
+    openAlarmDialogue :Result
+
     # 关闭报警对话 前端/设备均可调用以关闭对话
     closeAlarmDialogue : Result
 }

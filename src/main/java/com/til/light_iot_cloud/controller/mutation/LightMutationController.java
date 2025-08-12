@@ -345,6 +345,18 @@ public class LightMutationController {
         return Result.successful();
     }
 
+
+    /**
+     * 开启报警对话
+     * @param light 目标灯光设备
+     * @return 操作结果
+     */
+    @SchemaMapping(typeName = "LightMutation")
+    public Result<Void> openAlarmDialogue(Device light) {
+        sinkEventHolder.publishEvent(new AlarmDialogueOperateEvent(light, AlarmDialogueOperateType.OPEN));
+        return commandDown(light, LightCommandKey.CLOSE_ALARM_DIALOGUE, "null");
+    }
+
     /**
      * 关闭报警对话
      * <p>
