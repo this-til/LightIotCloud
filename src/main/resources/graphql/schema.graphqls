@@ -622,7 +622,7 @@ input LightDataInput  {
     # PM10颗粒物浓度（μg/m³）
     pm10 : Float
     # PM2.5颗粒物浓度（μg/m³）
-    pm2_5 : Float
+    pm25 : Float
     # 光照强度（lux）
     illumination : Float
     # 风速（m/s）

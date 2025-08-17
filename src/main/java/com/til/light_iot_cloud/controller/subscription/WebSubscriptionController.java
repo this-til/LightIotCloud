@@ -68,7 +68,7 @@ public class WebSubscriptionController {
      */
     @SubscriptionMapping
     public Flux<DeviceOnlineStateSwitchEvent> deviceOnlineStateSwitchEvent(@ContextValue AuthContext authContext) {
-        if (authContext.getLinkType() != LinkType.WEBSOCKET) {
+        if (authContext.getLinkType() == LinkType.HTTP) {
             throw new IllegalArgumentException("Only websocket links are supported");
         }
         return sinkEventHolder.getSinks(DeviceOnlineStateSwitchEvent.class).asFlux();
@@ -87,7 +87,7 @@ public class WebSubscriptionController {
      */
     @SubscriptionMapping
     public Flux<LightState> lightStateReportEvent(@ContextValue AuthContext authContext, @Argument Long lightId) {
-        if (authContext.getLinkType() != LinkType.WEBSOCKET) {
+        if (authContext.getLinkType() == LinkType.HTTP) {
             throw new IllegalArgumentException("Only websocket links are supported");
         }
 
@@ -105,7 +105,7 @@ public class WebSubscriptionController {
     }
 
     /**
-     * 灯光数据报告事件订阅
+     * 环境数据上报事件订阅
      * <p>
      * 订阅指定灯光设备的实时数据采集信息，包括环境监测数据、传感器读数等。
      * 只有设备的所有者才能订阅该设备的数据。
@@ -117,7 +117,7 @@ public class WebSubscriptionController {
      */
     @SubscriptionMapping
     public Flux<LightData> lightDataReportEvent(@ContextValue AuthContext authContext, @Argument Long lightId) {
-        if (authContext.getLinkType() != LinkType.WEBSOCKET) {
+        if (authContext.getLinkType() == LinkType.HTTP) {
             throw new IllegalArgumentException("Only websocket links are supported");
         }
 
@@ -149,7 +149,7 @@ public class WebSubscriptionController {
     @SubscriptionMapping
     public Flux<DetectionKeyframe> lightDetectionReportEvent(@ContextValue AuthContext authContext, @Argument Long lightId) {
 
-        if (authContext.getLinkType() != LinkType.WEBSOCKET) {
+        if (authContext.getLinkType() == LinkType.HTTP) {
             throw new IllegalArgumentException("Only websocket links are supported");
         }
 
@@ -181,7 +181,7 @@ public class WebSubscriptionController {
     @SubscriptionMapping
     public Flux<List<Detection>> lightSustainedDetectionReportEvent(@ContextValue AuthContext authContext, @Argument Long lightId) {
 
-        if (authContext.getLinkType() != LinkType.WEBSOCKET) {
+        if (authContext.getLinkType() == LinkType.HTTP) {
             throw new IllegalArgumentException("Only websocket links are supported");
         }
 
@@ -210,7 +210,7 @@ public class WebSubscriptionController {
     @SubscriptionMapping
     public Flux<AlarmDialogueOperateEvent> alarmDialogueOperateEvent(@ContextValue AuthContext authContext) {
 
-        if (authContext.getLinkType() != LinkType.WEBSOCKET) {
+        if (authContext.getLinkType() == LinkType.HTTP) {
             throw new IllegalArgumentException("Only websocket links are supported");
         }
 
@@ -231,7 +231,7 @@ public class WebSubscriptionController {
      */
     @SubscriptionMapping
     public Flux<CarState> carStateReportEvent(@ContextValue AuthContext authContext, @Argument Long carId) {
-        if (authContext.getLinkType() != LinkType.WEBSOCKET) {
+        if (authContext.getLinkType() == LinkType.HTTP) {
             throw new IllegalArgumentException("Only websocket links are supported");
         }
 
@@ -261,7 +261,7 @@ public class WebSubscriptionController {
     @SubscriptionMapping
     public Flux<UavState> uavStateReportEvent(@ContextValue AuthContext authContext, @Argument Long uavId) {
 
-        if (authContext.getLinkType() != LinkType.WEBSOCKET) {
+        if (authContext.getLinkType() == LinkType.HTTP) {
             throw new IllegalArgumentException("Only websocket links are supported");
         }
 

@@ -71,15 +71,13 @@ public class LightMutationController {
     private DeviceMutationController deviceMutationController;
 
     /**
-     * 上报灯光数据
+     * 环境数据上
      * <p>
      * 接收并处理灯光设备上报的传感器数据，包括环境监测数据、设备状态等。
      * 数据将被持久化存储并通过事件机制实时推送给订阅者。
      * 
      * @param light 灯光设备对象
      * @param lightDataInput 灯光数据输入，包含各种传感器读数
-     *                       - PM2.5数据会被同步到pm25字段
-     *                       - 设备ID会被自动设置
      * @return 操作结果，成功时返回数据保存状态
      * @throws IllegalArgumentException 当设备上下文无效时抛出
      */
@@ -96,7 +94,6 @@ public class LightMutationController {
         }
 
         lightDataInput.setLightId(light.getId());
-        lightDataInput.setPm25(lightDataInput.getPm2_5());
 
         sinkEventHolder.publishEvent(new LightDataReportEvent(light.getId(), lightDataInput));
 
@@ -104,7 +101,7 @@ public class LightMutationController {
     }
 
     /**
-     * 上报灯光状态
+     * 设备状态上报
      * <p>
      * 接收并处理灯光设备的状态信息，包括开关状态、亮度、工作模式等。
      * 状态信息会被更新到设备上下文中，并实时推送给订阅者。

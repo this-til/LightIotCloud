@@ -53,11 +53,7 @@ public class LightData {
     /**
      * PM2.5
      */
-    @TableField(value = "pm2_5")
     private Double pm25;
-
-    @TableField(exist = false)
-    private Double pm2_5;
 
     /**
      * 光照
