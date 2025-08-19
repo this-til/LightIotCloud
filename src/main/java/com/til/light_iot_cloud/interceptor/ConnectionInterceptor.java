@@ -1,6 +1,7 @@
 package com.til.light_iot_cloud.interceptor;
 
 import com.til.light_iot_cloud.component.DeviceConnectionManager;
+import com.til.light_iot_cloud.component.RequestStatisticsManager;
 import com.til.light_iot_cloud.config.JwtTokenConfig;
 import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.data.*;
@@ -43,11 +44,15 @@ public class ConnectionInterceptor implements WebSocketGraphQlInterceptor {
 
     @Resource
     private DeviceService deviceService;
+    @Resource
+    private RequestStatisticsManager requestStatisticsManager;
 
 
     @SneakyThrows
     @Override
     public @NotNull Mono<Object> handleConnectionInitialization(@NotNull WebSocketSessionInfo info, Map<String, Object> payload) {
+        requestStatisticsManager.addRequests();
+
         String authorization = Objects.requireNonNullElse(payload.get(AUTHORIZATION), "").toString();
 
         String username = Objects.requireNonNullElse(payload.get(USERNAME), "").toString();

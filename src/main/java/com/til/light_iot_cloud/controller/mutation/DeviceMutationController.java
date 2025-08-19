@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
  * - 确保检测模型和项目的存在性
  * - 持久化存储检测结果
  * - 实时推送检测事件
- * 
+ *
  * @author TIL
  */
 @Controller
@@ -85,10 +85,10 @@ public class DeviceMutationController {
      * <p>
      * 更新设备的配置参数，配置更改会通过事件机制推送到设备。
      * 支持各种设备参数的动态配置和实时更新。
-     * 
+     *
      * @param device 目标设备
-     * @param key 配置键名，标识具体的配置项
-     * @param value 配置值，新的配置参数值
+     * @param key    配置键名，标识具体的配置项
+     * @param value  配置值，新的配置参数值
      * @return 操作结果，成功时返回 successful
      */
     @SchemaMapping(typeName = "DeviceMutation")
@@ -102,10 +102,10 @@ public class DeviceMutationController {
      * <p>
      * 向设备下发控制命令，是所有设备命令操作的统一入口。
      * 命令通过事件机制异步发送到目标设备。
-     * 
+     *
      * @param device 目标设备
-     * @param key 命令键，标识具体的命令类型
-     * @param value 命令值，命令的参数或数据
+     * @param key    命令键，标识具体的命令类型
+     * @param value  命令值，命令的参数或数据
      * @return 操作结果，成功时返回 successful
      */
     @SchemaMapping(typeName = "DeviceMutation")
@@ -131,8 +131,8 @@ public class DeviceMutationController {
      * - 按检测模型分组检测项目
      * - 按检测项目类型进一步分组
      * - 确保数据库中模型和项目记录的存在性
-     * 
-     * @param light 灯光设备（检测设备）
+     *
+     * @param light          灯光设备（检测设备）
      * @param detectionInput 检测输入数据，包含图像和检测项目列表
      * @return 操作结果，成功时返回 true
      * @throws IllegalArgumentException 当设备上下文无效时抛出
@@ -223,7 +223,7 @@ public class DeviceMutationController {
      * - 实时监控和预警
      * - 临时检测任务
      * - 高频检测数据流
-     * 
+     *
      * @param light 灯光设备（检测设备）
      * @param items 检测项目输入列表，包含检测结果数据
      * @return 操作结果，成功时返回 successful
@@ -248,7 +248,7 @@ public class DeviceMutationController {
      * <p>
      * 将通用设备对象安全转换为灯光设备类型。
      * 在操作前验证设备类型，确保类型安全。
-     * 
+     *
      * @param device 要转换的设备对象
      * @return 相同的设备对象（类型验证后）
      * @throws IllegalArgumentException 当设备类型不是灯光设备时抛出
@@ -266,7 +266,7 @@ public class DeviceMutationController {
      * <p>
      * 将通用设备对象安全转换为车辆设备类型。
      * 在操作前验证设备类型，确保类型安全。
-     * 
+     *
      * @param device 要转换的设备对象
      * @return 相同的设备对象（类型验证后）
      * @throws IllegalArgumentException 当设备类型不是车辆设备时抛出
@@ -274,6 +274,24 @@ public class DeviceMutationController {
     @SchemaMapping(typeName = "DeviceMutation")
     public Device asCar(Device device) {
         if (!device.getDeviceType().equals(DeviceType.CAR)) {
+            throw new IllegalArgumentException("Device type is not Car");
+        }
+        return device;
+    }
+
+    /**
+     * 转换为车辆设备
+     * <p>
+     * 将通用设备对象安全转换为无人机设备类型。
+     * 在操作前验证设备类型，确保类型安全。
+     *
+     * @param device 要转换的设备对象
+     * @return 相同的设备对象（类型验证后）
+     * @throws IllegalArgumentException 当设备类型不是车辆设备时抛出
+     */
+    @SchemaMapping(typeName = "DeviceMutation")
+    public Device asUav(Device device) {
+        if (!device.getDeviceType().equals(DeviceType.UAV)) {
             throw new IllegalArgumentException("Device type is not Car");
         }
         return device;

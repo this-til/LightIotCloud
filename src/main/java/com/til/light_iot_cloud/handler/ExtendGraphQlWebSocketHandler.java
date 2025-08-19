@@ -1,8 +1,9 @@
 package com.til.light_iot_cloud.handler;
 
+import com.til.light_iot_cloud.component.RequestStatisticsManager;
 import com.til.light_iot_cloud.config.GraphQLConfig;
 import jakarta.annotation.PostConstruct;
-import lombok.Data;
+import jakarta.annotation.Resource;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -12,9 +13,6 @@ import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.graphql.server.WebGraphQlHandler;
 import org.springframework.graphql.server.webmvc.GraphQlWebSocketHandler;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.GenericHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -23,7 +21,6 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -35,6 +32,9 @@ public class ExtendGraphQlWebSocketHandler extends GraphQlWebSocketHandler {
 
     @Value("${extendGraphQlWebSocketHandler.checkInterval}")
     private Duration checkInterval;
+
+    @Resource
+    private RequestStatisticsManager requestStatisticsManager;
 
     private long pingTimeoutMs;
 
@@ -63,6 +63,7 @@ public class ExtendGraphQlWebSocketHandler extends GraphQlWebSocketHandler {
         );
 
         state.updateLastPingTime();
+        requestStatisticsManager.addRequests();
     }
 
     private void checkSessionsTimeout() {

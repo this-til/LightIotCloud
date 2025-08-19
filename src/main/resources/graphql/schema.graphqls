@@ -142,7 +142,6 @@ type Quaternion {
     w: Float
 }
 
-
 input QuaternionInput {
     x: Float
     y: Float
@@ -275,7 +274,7 @@ type LightData {
     # PM10颗粒物浓度（μg/m³）
     pm10 : Float
     # PM2.5颗粒物浓度（μg/m³）
-    pm2_5 : Float
+    pm25 : Float
     # 光照强度（lux）
     illumination : Float
     # 风速（m/s）
@@ -471,6 +470,8 @@ type DeviceMutation {
     asLight : LightMutation!
     # 转换为车辆变更操作
     asCar: CarMutation!
+    # 转换为无人机变更操作
+    asUav: UavMutation!
 }
 
 # 路灯命令键枚举
@@ -690,6 +691,17 @@ input CarStateInput {
 type UavMutation {
     # 上报无人机状态
     reportState(uavState : UavStateInput) : Result
+
+    # 下发路灯命令
+    commandDown(key : UavCommandKey, value : String) : Result
+
+    open : Result
+    close : Result
+}
+
+enum UavCommandKey {
+    OPEN,
+    CLOSE
 }
 
 # 无人机状态输入
@@ -721,6 +733,8 @@ type Subscription {
     # 测试订阅
     testSubscription : Int!
 
+    requestStatisticsSubscription : RequestStatistics!
+
     # 设备在线状态切换事件
     deviceOnlineStateSwitchEvent : DeviceOnlineStateSwitchEvent!
 
@@ -746,6 +760,10 @@ type Subscription {
     uavStateReportEvent(uavId : Int!) : UavState!
 }
 
+type RequestStatistics {
+    totalHttpRequests : Int
+    totalHttpErrors : Int
+}
 
 # 配置更新事件
 type UpdateConfigurationEvent {

@@ -191,19 +191,5 @@ public class LightController {
 
         return detectionKeyframeService.count(listQuery);
     }
-
-    /**
-     * PM2.5数据字段映射
-     * <p>
-     * 将灯光数据中的PM2.5字段映射到GraphQL响应中。
-     * 解决字段命名不一致的问题（数据库字段pm25 -> GraphQL字段pm2_5）。
-     * 
-     * @param lightData 灯光数据对象
-     * @return PM2.5数值
-     */
-    @SchemaMapping(typeName = "LightData")
-    public Double pm2_5(LightData lightData) {
-        return lightData.getPm25();
-    }
 }
 

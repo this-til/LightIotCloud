@@ -1,5 +1,6 @@
 package com.til.light_iot_cloud.interceptor;
 
+import com.til.light_iot_cloud.component.RequestStatisticsManager;
 import com.til.light_iot_cloud.config.JwtTokenConfig;
 import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.enums.LinkType;
@@ -23,8 +24,13 @@ public class AuthInterceptor implements WebGraphQlInterceptor {
     @Resource
     private UserService userService;
 
+    @Resource
+    private RequestStatisticsManager requestStatisticsManager;
+
     @Override
     public @NotNull Mono<WebGraphQlResponse> intercept(WebGraphQlRequest request, @NotNull Chain chain) {
+
+        requestStatisticsManager.addRequests();
 
         if (request.getAttributes().get(ConnectionInterceptor.AUTH_CONTEXT) instanceof AuthContext authContext) {
             request.configureExecutionInput(

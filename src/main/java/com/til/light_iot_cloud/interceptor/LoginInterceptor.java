@@ -1,5 +1,6 @@
 package com.til.light_iot_cloud.interceptor;
 
+import com.til.light_iot_cloud.component.RequestStatisticsManager;
 import com.til.light_iot_cloud.config.JwtTokenConfig;
 import com.til.light_iot_cloud.context.AuthContext;
 import com.til.light_iot_cloud.enums.LinkType;
@@ -21,8 +22,13 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Resource
     private UserService userService;
 
+    @Resource
+    private RequestStatisticsManager requestStatisticsManager;
+
     @Override
     public boolean preHandle(final @NotNull HttpServletRequest request, final @NotNull HttpServletResponse response, final @NotNull Object handler) throws Exception {
+        requestStatisticsManager.addRequests();
+
         String authHeader = request.getHeader("Authorization");
 
         // If no Authorization header, return unauthorized

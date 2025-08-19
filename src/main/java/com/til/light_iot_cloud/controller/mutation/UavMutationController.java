@@ -7,6 +7,7 @@ import com.til.light_iot_cloud.data.Device;
 import com.til.light_iot_cloud.data.LightState;
 import com.til.light_iot_cloud.data.Result;
 import com.til.light_iot_cloud.data.UavState;
+import com.til.light_iot_cloud.enums.UavCommandKey;
 import com.til.light_iot_cloud.event.LightStateReportEvent;
 import com.til.light_iot_cloud.event.UavStateReportEvent;
 import com.til.light_iot_cloud.service.DeviceService;
@@ -31,7 +32,7 @@ import org.springframework.stereotype.Controller;
  * - 验证无人机设备上下文的有效性
  * - 确保操作的设备类型为无人机
  * - 维护无人机运行状态的一致性
- * 
+ *
  * @author TIL
  */
 @Controller
@@ -42,6 +43,9 @@ public class UavMutationController {
 
     @Resource
     private SinkEventHolder sinkEventHolder;
+
+    @Resource
+    private DeviceMutationController deviceMutationController;
 
     /**
      * 上报无人机状态
@@ -56,8 +60,8 @@ public class UavMutationController {
      * - 电池状态和剩余电量
      * - 飞行模式和状态
      * - 传感器数据
-     * 
-     * @param uav 无人机设备对象
+     *
+     * @param uav      无人机设备对象
      * @param uavState 无人机状态数据，包含设备的当前飞行状态
      * @return 操作结果，成功时返回 successful
      * @throws IllegalArgumentException 当设备上下文无效或类型不匹配时抛出
@@ -81,4 +85,18 @@ public class UavMutationController {
         return Result.successful();
     }
 
+    @SchemaMapping(typeName = "UavMutation")
+    public Result<Void> commandDown(Device uav, @Argument UavCommandKey key, @Argument String value) {
+        return deviceMutationController.commandDown(uav, key.getValue(), value);
+    }
+
+    @SchemaMapping(typeName = "UavMutation")
+    public Result<Void> open(Device uav) {
+        return commandDown(uav, UavCommandKey.OPEN, "null");
+    }
+
+    @SchemaMapping(typeName = "UavMutation")
+    public Result<Void> close(Device uav) {
+        return commandDown(uav, UavCommandKey.CLOSE, "null");
+    }
 }
