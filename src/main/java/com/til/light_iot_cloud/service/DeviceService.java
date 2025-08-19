@@ -34,12 +34,16 @@ public interface DeviceService extends IService<Device> {
 
     @Nullable
     default Device getDeviceById(Long userId, Long id, DeviceType deviceType) {
-        return this.getOne(
-                new LambdaQueryWrapper<Device>()
-                        .eq(Device::getUserId, userId)
-                        .eq(Device::getId, id)
-                        .eq(Device::getDeviceType, deviceType)
-        );
+        LambdaQueryWrapper<Device> eq = new LambdaQueryWrapper<Device>();
+        eq.eq(Device::getUserId, userId);
+
+        if (deviceType != null) {
+            eq.eq(Device::getDeviceType, deviceType);
+        }
+
+        eq.eq(Device::getId, id);
+
+        return this.getOne(eq);
     }
 
     default List<Device> getDeviceByUserId(Long userId) {
@@ -59,13 +63,19 @@ public interface DeviceService extends IService<Device> {
     }
 
     @Nullable
-    default Device getDeviceByName(Long userId, String name, DeviceType deviceType) {
-        return getOne(
-                new LambdaQueryWrapper<Device>()
-                        .eq(Device::getUserId, userId)
-                        .eq(Device::getName, name)
-                        .eq(Device::getDeviceType, deviceType)
-        );
+    default Device getDeviceByName(Long userId, String name, @Nullable DeviceType deviceType) {
+
+        LambdaQueryWrapper<Device> eq = new LambdaQueryWrapper<Device>();
+
+        eq.eq(Device::getUserId, userId);
+
+        if (deviceType != null) {
+            eq.eq(Device::getDeviceType, deviceType);
+        }
+
+        eq.eq(Device::getName, name);
+
+        return getOne(eq);
     }
 
     default Device existDevice(Long userId, String name, DeviceType deviceType) {
