@@ -132,11 +132,9 @@ public class WebSubscriptionController {
         }
 
         Device device = deviceService.getDeviceById(authContext.getUser().getId(), lightId, DeviceType.LIGHT);
-
         if (device == null) {
             throw new IllegalArgumentException("No such light");
         }
-
 
         return sinkEventHolder.getSinks(LightDataReportEvent.class)
                 .asFlux()

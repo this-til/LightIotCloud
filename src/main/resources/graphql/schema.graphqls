@@ -503,6 +503,14 @@ enum LightCommandKey {
 
     # 关闭对话
     CLOSE_ALARM_DIALOGUE
+
+    #切换显示模式
+    DISPLAY_MODE
+}
+
+enum DisplayMode {
+    ENVIRONMENT
+    CAROUSEL
 }
 
 # 路灯变更操作
@@ -557,6 +565,9 @@ type LightMutation {
 
     # 关闭报警对话 前端/设备均可调用以关闭对话
     closeAlarmDialogue : Result
+
+    #切换显示模式
+    switchDisplayMode(displayMode : DisplayMode) : Result
 }
 
 # 检测输入数据
@@ -733,6 +744,7 @@ type Subscription {
     # 测试订阅
     testSubscription : Int!
 
+    # 请求统计订阅
     requestStatisticsSubscription : RequestStatistics!
 
     # 设备在线状态切换事件

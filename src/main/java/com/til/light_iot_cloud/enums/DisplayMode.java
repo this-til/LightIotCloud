@@ -7,10 +7,10 @@ import lombok.ToString;
 @Getter
 @ToString
 @AllArgsConstructor
-public enum UavCommandKey {
-    OPEN("Uav.Open"),
-    CLOSE("Uav.Close");
-    ;
+public enum DisplayMode {
+    ENVIRONMENT("environment"),
+    CAROUSEL("carousel");
+
 
     private final String value;
 }
